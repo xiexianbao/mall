@@ -19,11 +19,11 @@ public class CustomException extends RuntimeException {
         this(500, message);
     }
 
-    /**
-     * Throwable中的fillInStackTrace方法使用synchronized修饰，为了避免其在大量创建CustomException对象时影响系统性能，所以这个方法重写为一个简单的普通方法
-     */
-    @Override
-    public Throwable fillInStackTrace() {
-        return this;
-    }
+    // /**
+    //  * Throwable中的fillInStackTrace方法使用synchronized修饰，为了避免其在大量创建CustomException对象时影响系统性能，所以这个方法重写为一个简单的普通方法
+    //  */
+    // @Override
+    // public Throwable fillInStackTrace() {
+    //     return this;
+    // }
 }

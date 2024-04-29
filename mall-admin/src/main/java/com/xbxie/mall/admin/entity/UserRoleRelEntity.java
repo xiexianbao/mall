@@ -1,46 +1,31 @@
 package com.xbxie.mall.admin.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 用户实体类
- * created by xbxie on 2024/4/20
+ * created by xbxie on 2024/4/27
  */
 @Data
-@TableName("ums_user")
-public class UserEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
+@TableName("ums_user_role_rel")
+public class UserRoleRelEntity {
     /**
-     * 用户id
+     * id
      */
     @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
-     * 用户名
+     * 用户id
      */
-    private String name;
+    private Long userId;
 
     /**
-     * 用户账号
+     * 角色id
      */
-    private String account;
-
-    /**
-     * 账号密码
-     */
-    private String password;
-
-    /**
-     * 账号状态 0：禁用，1：启用
-     */
-    private Integer status;
+    private Long roleId;
 
     /**
      * 是否删除 0：未删除，1：已删除

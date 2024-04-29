@@ -1,46 +1,40 @@
 package com.xbxie.mall.admin.entity;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 用户实体类
- * created by xbxie on 2024/4/20
+ * created by xbxie on 2024/4/25
  */
 @Data
-@TableName("ums_user")
-public class UserEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
+@TableName("ums_menu")
+public class MenuEntity {
     /**
-     * 用户id
+     * 菜单id
      */
-    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
-     * 用户名
+     * 父菜单id
+     */
+    private Long pid;
+
+    /**
+     * 菜单名称
      */
     private String name;
 
     /**
-     * 用户账号
+     * 菜单路径
      */
-    private String account;
-
-    /**
-     * 账号密码
-     */
-    private String password;
-
-    /**
-     * 账号状态 0：禁用，1：启用
-     */
-    private Integer status;
+    private String url;
 
     /**
      * 是否删除 0：未删除，1：已删除

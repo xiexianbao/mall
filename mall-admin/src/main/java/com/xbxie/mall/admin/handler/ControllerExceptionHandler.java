@@ -1,4 +1,4 @@
-package com.xbxie.mall.admin.exception;
+package com.xbxie.mall.admin.handler;
 
 import com.xbxie.mall.common.utils.CustomException;
 import com.xbxie.mall.common.utils.R;
@@ -6,6 +6,8 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -23,7 +25,7 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(BindException.class)
     public R validateExceptionHandler(BindException e) {
         return R.fail(
-                e.getFieldErrors().stream().map(FieldError::getDefaultMessage).collect(Collectors.joining("；"))
+            e.getFieldErrors().stream().map(FieldError::getDefaultMessage).collect(Collectors.joining("；"))
         );
     }
 
