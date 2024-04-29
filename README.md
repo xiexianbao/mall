@@ -1,0 +1,2 @@
+这是一个后端技能打怪升级的电商项目，目标要做成一个高可用、高并发、高性能的分布式微服务项目，将要采用的技术栈是SpringCloud+SpringBoot+SpringSecurity+SpringGateway+MybatisPlus+Mysql+Nginx+Redis+RabbitMQ+Docker+K8s。
+目前完成了权限管理系统的基本的增删改查接口以及对应的单元测试，后面将逐步开发电商相关的业务。
