@@ -24,17 +24,17 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/add")
-    public R add(@Validated @RequestBody UserAddVo userAddVo) {
+    public R<Void> add(@Validated @RequestBody UserAddVo userAddVo) {
         return userService.add(userAddVo);
     }
 
     @PostMapping("/del/{id}")
-    public R del(@PathVariable("id") Long id) {
+    public R<Void> del(@PathVariable("id") Long id) {
         return userService.del(id);
     }
 
     @PostMapping("/update")
-    public R update(@Validated @RequestBody UserUpdateVo userUpdateVo) {
+    public R<Void> update(@Validated @RequestBody UserUpdateVo userUpdateVo) {
         return userService.updateUser(userUpdateVo);
     }
 

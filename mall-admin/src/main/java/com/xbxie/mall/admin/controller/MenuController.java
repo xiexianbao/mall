@@ -1,7 +1,6 @@
 package com.xbxie.mall.admin.controller;
 
 import com.xbxie.mall.admin.entity.MenuEntity;
-import com.xbxie.mall.admin.entity.UserEntity;
 import com.xbxie.mall.admin.service.MenuService;
 import com.xbxie.mall.admin.vo.*;
 import com.xbxie.mall.common.utils.PageData;
@@ -22,17 +21,17 @@ public class MenuController {
     private MenuService menuService;
 
     @PostMapping("/add")
-    public R add(@Validated @RequestBody MenuAddVo menuAddVo) {
+    public R<Void> add(@Validated @RequestBody MenuAddVo menuAddVo) {
         return menuService.add(menuAddVo);
     }
 
     @PostMapping("/del/{id}")
-    public R del(@PathVariable("id") Long id) {
+    public R<Void> del(@PathVariable("id") Long id) {
         return menuService.del(id);
     }
 
     @PostMapping("/update")
-    public R update(@Validated @RequestBody MenuUpdateVo menuUpdateVo) {
+    public R<Void> update(@Validated @RequestBody MenuUpdateVo menuUpdateVo) {
         return menuService.updateMenu(menuUpdateVo);
     }
 

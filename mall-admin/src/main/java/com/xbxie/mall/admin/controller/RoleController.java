@@ -1,7 +1,6 @@
 package com.xbxie.mall.admin.controller;
 
 import com.xbxie.mall.admin.entity.RoleEntity;
-import com.xbxie.mall.admin.entity.UserEntity;
 import com.xbxie.mall.admin.service.RoleService;
 import com.xbxie.mall.admin.vo.*;
 import com.xbxie.mall.common.utils.PageData;
@@ -22,17 +21,17 @@ public class RoleController {
     private RoleService roleService;
 
     @PostMapping("/add")
-    public R add(@Validated @RequestBody RoleAddVo roleAddVo) {
+    public R<Void> add(@Validated @RequestBody RoleAddVo roleAddVo) {
         return roleService.add(roleAddVo);
     }
 
     @PostMapping("/del/{id}")
-    public R del(@PathVariable("id") Long id) {
+    public R<Void> del(@PathVariable("id") Long id) {
         return roleService.del(id);
     }
 
     @PostMapping("/update")
-    public R update(@Validated @RequestBody RoleUpdateVo roleUpdateVo) {
+    public R<Void> update(@Validated @RequestBody RoleUpdateVo roleUpdateVo) {
         return roleService.updateRole(roleUpdateVo);
     }
 

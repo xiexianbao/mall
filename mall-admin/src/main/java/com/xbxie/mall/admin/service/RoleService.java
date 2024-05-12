@@ -12,11 +12,11 @@ import com.xbxie.mall.common.utils.R;
  * created by xbxie on 2024/4/25
  */
 public interface RoleService extends IService<RoleEntity> {
-    R add(RoleAddVo roleAddVo);
+    R<Void> add(RoleAddVo roleAddVo);
 
-    R del(Long id);
+    R<Void> del(Long id);
 
-    R updateRole(RoleUpdateVo roleUpdateVo);
+    R<Void> updateRole(RoleUpdateVo roleUpdateVo);
 
     R<PageData<RoleEntity>> pageList(RolePageVo rolePageVo);
 }

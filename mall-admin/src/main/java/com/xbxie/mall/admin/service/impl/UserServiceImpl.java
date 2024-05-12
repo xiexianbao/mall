@@ -22,7 +22,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -35,7 +34,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @Transactional
     @Override
-    public R add(UserAddVo userAddVo) {
+    public R<Void> add(UserAddVo userAddVo) {
         // 用户名或者用户账号重复
         List<UserEntity> list = this.list(new QueryWrapper<UserEntity>().eq("name", userAddVo.getName()).or().eq("account", userAddVo.getAccount()));
         if (!CollectionUtils.isEmpty(list)) {
@@ -84,7 +83,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @Transactional
     @Override
-    public R del(Long id) {
+    public R<Void> del(Long id) {
         // 用户不存在
         if (!this.exists(new QueryWrapper<UserEntity>().eq("id", id))) {
             return R.fail("用户不存在");
@@ -110,7 +109,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @Transactional
     @Override
-    public R updateUser(UserUpdateVo userUpdateVo) {
+    public R<Void> updateUser(UserUpdateVo userUpdateVo) {
 
         // 更新的用户不存在
         Long id = userUpdateVo.getId();

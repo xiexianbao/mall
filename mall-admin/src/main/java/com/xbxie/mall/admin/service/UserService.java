@@ -9,8 +9,8 @@ import com.xbxie.mall.common.utils.PageData;
 import com.xbxie.mall.common.utils.R;
 
 public interface UserService extends IService<UserEntity> {
-    R add(UserAddVo userAddVo);
-    R del(Long id);
-    R updateUser(UserUpdateVo userUpdateVo);
+    R<Void> add(UserAddVo userAddVo);
+    R<Void> del(Long id);
+    R<Void> updateUser(UserUpdateVo userUpdateVo);
     R<PageData<UserEntity>> pageList(UserPageVo userPageVo);
 }

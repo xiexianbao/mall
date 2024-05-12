@@ -2,7 +2,6 @@ package com.xbxie.mall.common.utils;
 
 import lombok.Data;
 
-import java.util.HashMap;
 
 @Data
 public class R<D> {
@@ -12,22 +11,22 @@ public class R<D> {
     
     private D data;
 
-    public static R success() {
-        R r = new R();
+    public static R<Void> success() {
+        R<Void> r = new R<>();
         r.setCode(0);
         r.setMessage("success");
         return r;
     }
 
-    public static R success(String message) {
-        R r = new R();
+    public static R<Void> success(String message) {
+        R<Void> r = new R<>();
         r.setCode(0);
         r.setMessage(message);
         return r;
     }
 
     public static <T> R<T> success(T data) {
-        R<T> r = new R<T>();
+        R<T> r = new R<>();
         r.setCode(0);
         r.setMessage("success");
         r.setData(data);
@@ -35,22 +34,22 @@ public class R<D> {
     }
     
 
-    public static R fail(int code, String message) {
-        R r = new R();
+    public static R<Void> fail(int code, String message) {
+        R<Void> r = new R<>();
         r.setCode(code);
         r.setMessage(message);
         return r;
     }
 
-    public static R<?> fail(String message) {
-        R<?> r = new R<>();
+    public static R<Void> fail(String message) {
+        R<Void> r = new R<>();
         r.setCode(500);
         r.setMessage(message);
         return r;
     }
 
-    public static R<?> fail() {
-        R<?> r = new R<>();
+    public static R<Void> fail() {
+        R<Void> r = new R<>();
         r.setCode(500);
         r.setMessage("fail");
         return r;
