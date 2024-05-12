@@ -5,8 +5,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xbxie.mall.admin.entity.RoleEntity;
 import com.xbxie.mall.admin.entity.RoleMenuRelEntity;
-import com.xbxie.mall.admin.entity.UserEntity;
-import com.xbxie.mall.admin.entity.UserRoleRelEntity;
 import com.xbxie.mall.admin.mapper.RoleMapper;
 import com.xbxie.mall.admin.service.RoleMenuRelService;
 import com.xbxie.mall.admin.service.RoleService;
@@ -24,7 +22,6 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -36,7 +33,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> impleme
     private RoleMenuRelService roleMenuRelService;
 
     @Override
-    public R add(RoleAddVo roleAddVo) {
+    public R<Void> add(RoleAddVo roleAddVo) {
         // 角色名重复
         if (this.exists(new QueryWrapper<RoleEntity>().eq("name", roleAddVo.getName()))) {
             return R.fail("角色名重复");
@@ -72,7 +69,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> impleme
 
     @Transactional
     @Override
-    public R del(Long id) {
+    public R<Void> del(Long id) {
         // 角色不存在
         if (!this.exists(new QueryWrapper<RoleEntity>().eq("id", id))) {
             return R.fail("角色不存在");
@@ -95,7 +92,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> impleme
     }
 
     @Override
-    public R updateRole(RoleUpdateVo roleUpdateVo) {
+    public R<Void> updateRole(RoleUpdateVo roleUpdateVo) {
         // 角色不存在
         Long id = roleUpdateVo.getId();
         if (this.getById(id) == null) {

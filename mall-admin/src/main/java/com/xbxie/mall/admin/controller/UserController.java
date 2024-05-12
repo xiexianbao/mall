@@ -2,9 +2,7 @@ package com.xbxie.mall.admin.controller;
 
 import com.xbxie.mall.admin.entity.UserEntity;
 import com.xbxie.mall.admin.service.UserService;
-import com.xbxie.mall.admin.vo.UserAddVo;
-import com.xbxie.mall.admin.vo.UserPageVo;
-import com.xbxie.mall.admin.vo.UserUpdateVo;
+import com.xbxie.mall.admin.vo.*;
 import com.xbxie.mall.common.utils.PageData;
 import com.xbxie.mall.common.utils.R;
 import lombok.extern.slf4j.Slf4j;
@@ -24,17 +22,17 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/add")
-    public R add(@Validated @RequestBody UserAddVo userAddVo) {
+    public R<Void> add(@Validated @RequestBody UserAddVo userAddVo) {
         return userService.add(userAddVo);
     }
 
     @PostMapping("/del/{id}")
-    public R del(@PathVariable("id") Long id) {
+    public R<Void> del(@PathVariable("id") Long id) {
         return userService.del(id);
     }
 
     @PostMapping("/update")
-    public R update(@Validated @RequestBody UserUpdateVo userUpdateVo) {
+    public R<Void> update(@Validated @RequestBody UserUpdateVo userUpdateVo) {
         return userService.updateUser(userUpdateVo);
     }
 

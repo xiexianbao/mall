@@ -33,7 +33,7 @@ public class MenuUpdateVo {
      */
     @Pattern(regexp = "^(\\s*)|(/.*)$", message = "菜单路径需要以斜杠/开头")
     @NotBlank(message = "请输入菜单路径")
-    private String url;
+    private String path;
 }
 
 //

@@ -1,20 +1,12 @@
 package com.xbxie.mall.admin.controller.role;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.xbxie.mall.admin.entity.RoleEntity;
 import com.xbxie.mall.admin.entity.RoleMenuRelEntity;
-import com.xbxie.mall.admin.entity.UserEntity;
-import com.xbxie.mall.admin.entity.UserRoleRelEntity;
 import com.xbxie.mall.admin.service.RoleService;
-import com.xbxie.mall.admin.service.UserService;
 import com.xbxie.mall.admin.service.impl.RoleMenuRelServiceImpl;
-import com.xbxie.mall.admin.service.impl.RoleServiceImpl;
 import com.xbxie.mall.admin.utils.TestUtils;
-import com.xbxie.mall.admin.vo.RoleAddVo;
 import com.xbxie.mall.admin.vo.RoleUpdateVo;
-import com.xbxie.mall.admin.vo.UserUpdateVo;
-import com.xbxie.mall.common.utils.R;
 import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.BeanUtils;
@@ -22,11 +14,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * 测试更新角色接口

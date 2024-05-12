@@ -13,7 +13,6 @@ import com.xbxie.mall.admin.vo.MenuUpdateVo;
 import com.xbxie.mall.common.utils.CustomException;
 import com.xbxie.mall.common.utils.PageData;
 import com.xbxie.mall.common.utils.R;
-import com.xbxie.mall.common.utils.ValidationUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +22,6 @@ import org.springframework.util.StringUtils;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * created by xbxie on 2024/4/25
@@ -34,14 +32,14 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, MenuEntity> impleme
     private RoleMenuRelService roleMenuRelService;
 
     @Override
-    public R add(MenuAddVo menuAddVo) {
-        List<MenuEntity> list = this.list(new QueryWrapper<MenuEntity>().eq("name", menuAddVo.getName()).or().eq("url", menuAddVo.getUrl()));
+    public R<Void> add(MenuAddVo menuAddVo) {
+        List<MenuEntity> list = this.list(new QueryWrapper<MenuEntity>().eq("name", menuAddVo.getName()).or().eq("url", menuAddVo.getPath()));
 
         if (!CollectionUtils.isEmpty(list)) {
             if (list.stream().anyMatch(item -> Objects.equals(item.getName(), menuAddVo.getName()))) {
                 return R.fail("菜单名重复");
             }
-            if (list.stream().anyMatch(item -> Objects.equals(item.getUrl(), menuAddVo.getUrl()))) {
+            if (list.stream().anyMatch(item -> Objects.equals(item.getPath(), menuAddVo.getPath()))) {
                 return R.fail("菜单路径重复");
             }
         }
@@ -53,7 +51,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, MenuEntity> impleme
 
     @Transactional
     @Override
-    public R del(Long id) {
+    public R<Void> del(Long id) {
         // 菜单不存在
         if (!this.exists(new QueryWrapper<MenuEntity>().eq("id", id))) {
             return R.fail("菜单不存在");
@@ -92,7 +90,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, MenuEntity> impleme
     }
 
     @Override
-    public R updateMenu(MenuUpdateVo menuUpdateVo) {
+    public R<Void> updateMenu(MenuUpdateVo menuUpdateVo) {
 
         // 更新的菜单不存在
         Long id = menuUpdateVo.getId();
@@ -104,13 +102,13 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, MenuEntity> impleme
         List<MenuEntity> list = this.list(
             new QueryWrapper<MenuEntity>()
                 .ne("id", id)
-                .and(i -> i.eq("name", menuUpdateVo.getName()).or().eq("url", menuUpdateVo.getUrl()))
+                .and(i -> i.eq("name", menuUpdateVo.getName()).or().eq("url", menuUpdateVo.getPath()))
         );
         if (!CollectionUtils.isEmpty(list)) {
             if (list.stream().anyMatch(item -> Objects.equals(item.getName(), menuUpdateVo.getName()))) {
                 return R.fail("菜单名重复");
             }
-            if (list.stream().anyMatch(item -> Objects.equals(item.getUrl(), menuUpdateVo.getUrl()))) {
+            if (list.stream().anyMatch(item -> Objects.equals(item.getPath(), menuUpdateVo.getPath()))) {
                 return R.fail("菜单路径重复");
             }
         }

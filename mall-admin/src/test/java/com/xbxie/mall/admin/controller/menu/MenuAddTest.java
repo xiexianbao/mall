@@ -3,13 +3,9 @@ package com.xbxie.mall.admin.controller.menu;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.xbxie.mall.admin.entity.MenuEntity;
-import com.xbxie.mall.admin.entity.RoleEntity;
 import com.xbxie.mall.admin.service.impl.MenuServiceImpl;
-import com.xbxie.mall.admin.service.impl.RoleServiceImpl;
 import com.xbxie.mall.admin.utils.TestUtils;
 import com.xbxie.mall.admin.vo.MenuAddVo;
-import com.xbxie.mall.admin.vo.RoleAddVo;
-import com.xbxie.mall.admin.vo.UserAddVo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,8 +16,6 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.assertj.core.util.Arrays;
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * 测试新增菜单接口
@@ -51,7 +45,7 @@ public class MenuAddTest {
 
         menuAddVo.setPid(pid);
         menuAddVo.setName(name);
-        menuAddVo.setUrl(path);
+        menuAddVo.setPath(path);
 
         testUtils.assertSuccess(url, menuAddVo, "添加菜单成功");
 
@@ -63,7 +57,7 @@ public class MenuAddTest {
         Assertions.assertNotNull(menuEntity.getId());
         Assertions.assertEquals(menuAddVo.getPid(), menuEntity.getPid());
         Assertions.assertEquals(menuAddVo.getName(), menuEntity.getName());
-        Assertions.assertEquals(menuAddVo.getUrl(), menuEntity.getUrl());
+        Assertions.assertEquals(menuAddVo.getPath(), menuEntity.getPath());
         Assertions.assertEquals(0, menuEntity.getIsDel());
         Assertions.assertNotNull(menuEntity.getCreateTime());
         Assertions.assertNotNull(menuEntity.getUpdateTime());
@@ -78,11 +72,11 @@ public class MenuAddTest {
 
         MenuAddVo menuAddVo1 = new MenuAddVo();
         menuAddVo1.setName(random.nextLong() + "");
-        menuAddVo1.setUrl(path1AndPath2);
+        menuAddVo1.setPath(path1AndPath2);
 
         MenuAddVo menuAddVo2 = new MenuAddVo();
         menuAddVo2.setName(random.nextLong() + "");
-        menuAddVo2.setUrl(path1AndPath2);
+        menuAddVo2.setPath(path1AndPath2);
 
         testUtils.simplePerformAssert(url, menuAddVo1, 0, "添加菜单成功");
         testUtils.simplePerformAssert(url, menuAddVo2, 500, "菜单路径重复");
@@ -100,11 +94,11 @@ public class MenuAddTest {
 
         MenuAddVo menuAddVo1 = new MenuAddVo();
         menuAddVo1.setName(name1AndName2);
-        menuAddVo1.setUrl("/" + random.nextLong());
+        menuAddVo1.setPath("/" + random.nextLong());
 
         MenuAddVo menuAddVo2 = new MenuAddVo();
         menuAddVo2.setName(name1AndName2);
-        menuAddVo2.setUrl("/" + random.nextLong());
+        menuAddVo2.setPath("/" + random.nextLong());
 
         testUtils.simplePerformAssert(url, menuAddVo1, 0, "添加菜单成功");
         testUtils.simplePerformAssert(url, menuAddVo2, 500, "菜单名重复");
@@ -122,7 +116,7 @@ public class MenuAddTest {
             Random random = new Random();
             String name = random.nextLong() + "";
             menuAddVo.setName(name);
-            menuAddVo.setUrl(path);
+            menuAddVo.setPath(path);
             testUtils.assertFail(url, menuAddVo, "菜单路径需要以斜杠/开头");
         }
     }
@@ -161,7 +155,7 @@ public class MenuAddTest {
                     MenuAddVo menuAddVo = new MenuAddVo();
                     menuAddVo.setPid(null);
                     menuAddVo.setName(name);
-                    menuAddVo.setUrl(url);
+                    menuAddVo.setPath(url);
                     menuAddVos.add(menuAddVo);
                 }
 

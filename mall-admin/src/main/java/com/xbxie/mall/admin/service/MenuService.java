@@ -12,11 +12,11 @@ import com.xbxie.mall.common.utils.R;
  * created by xbxie on 2024/4/25
  */
 public interface MenuService extends IService<MenuEntity> {
-    R add(MenuAddVo menuAddVo);
+    R<Void> add(MenuAddVo menuAddVo);
 
-    R del(Long id);
+    R<Void> del(Long id);
 
     R<PageData<MenuEntity>> pageList(MenuPageVo menuPageVo);
 
-    R updateMenu(MenuUpdateVo menuUpdateVo);
+    R<Void> updateMenu(MenuUpdateVo menuUpdateVo);
 }

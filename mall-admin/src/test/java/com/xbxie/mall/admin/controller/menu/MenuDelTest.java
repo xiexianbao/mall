@@ -2,11 +2,7 @@ package com.xbxie.mall.admin.controller.menu;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.xbxie.mall.admin.entity.MenuEntity;
-import com.xbxie.mall.admin.entity.UserEntity;
-import com.xbxie.mall.admin.entity.UserRoleRelEntity;
 import com.xbxie.mall.admin.service.MenuService;
-import com.xbxie.mall.admin.service.UserRoleRelService;
-import com.xbxie.mall.admin.service.UserService;
 import com.xbxie.mall.admin.utils.TestUtils;
 import com.xbxie.mall.common.utils.R;
 import org.junit.jupiter.api.*;
@@ -46,7 +42,7 @@ public class MenuDelTest {
             menuEntity.setId(null);
             menuEntity.setPid(null);
             menuEntity.setName(random.nextLong() + "");
-            menuEntity.setUrl("/" + i);
+            menuEntity.setPath("/" + i);
             menuEntity.setIsDel(null);
             menuEntity.setCreateTime(null);
             menuEntity.setUpdateTime(null);
@@ -67,7 +63,7 @@ public class MenuDelTest {
     void del() {
         Long menuId = this.menuIds.stream().findAny().get();
 
-        R resData = testUtils.getResData(url + "/" + menuId, null);
+        R<Void> resData = testUtils.getResData(url + "/" + menuId, null);
 
         // 进行返回结果
         Assertions.assertEquals(0, resData.getCode());

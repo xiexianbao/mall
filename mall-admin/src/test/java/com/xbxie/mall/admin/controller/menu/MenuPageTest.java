@@ -3,13 +3,9 @@ package com.xbxie.mall.admin.controller.menu;
 import com.alibaba.fastjson.TypeReference;
 import com.xbxie.mall.admin.entity.MenuEntity;
 import com.xbxie.mall.admin.entity.UserEntity;
-import com.xbxie.mall.admin.entity.UserRoleRelEntity;
 import com.xbxie.mall.admin.service.MenuService;
-import com.xbxie.mall.admin.service.UserRoleRelService;
-import com.xbxie.mall.admin.service.UserService;
 import com.xbxie.mall.admin.utils.TestUtils;
 import com.xbxie.mall.admin.vo.MenuPageVo;
-import com.xbxie.mall.admin.vo.UserPageVo;
 import com.xbxie.mall.common.utils.PageData;
 import com.xbxie.mall.common.utils.R;
 import org.junit.jupiter.api.*;
@@ -52,7 +48,7 @@ public class MenuPageTest {
 
             menuEntity.setId(null);
             menuEntity.setName(namePrefix + i);
-            menuEntity.setUrl("/" + namePrefix + i);
+            menuEntity.setPath("/" + namePrefix + i);
             menuEntity.setIsDel(0);
             menuEntity.setCreateTime(null);
             menuEntity.setUpdateTime(null);

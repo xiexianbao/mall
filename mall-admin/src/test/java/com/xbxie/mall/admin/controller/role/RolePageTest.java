@@ -1,32 +1,22 @@
 package com.xbxie.mall.admin.controller.role;
 
 import com.alibaba.fastjson.TypeReference;
-import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.xbxie.mall.admin.entity.RoleEntity;
 import com.xbxie.mall.admin.entity.RoleMenuRelEntity;
-import com.xbxie.mall.admin.entity.UserEntity;
-import com.xbxie.mall.admin.entity.UserRoleRelEntity;
 import com.xbxie.mall.admin.service.RoleMenuRelService;
 import com.xbxie.mall.admin.service.RoleService;
 import com.xbxie.mall.admin.service.UserService;
-import com.xbxie.mall.admin.service.impl.RoleServiceImpl;
 import com.xbxie.mall.admin.utils.TestUtils;
 import com.xbxie.mall.admin.vo.RolePageVo;
-import com.xbxie.mall.admin.vo.UserPageVo;
 import com.xbxie.mall.common.utils.PageData;
 import com.xbxie.mall.common.utils.R;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * 测试角色分页接口

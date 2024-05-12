@@ -8,21 +8,19 @@ import com.xbxie.mall.admin.entity.UserRoleRelEntity;
 import com.xbxie.mall.admin.mapper.UserMapper;
 import com.xbxie.mall.admin.service.UserRoleRelService;
 import com.xbxie.mall.admin.service.UserService;
-import com.xbxie.mall.admin.vo.UserAddVo;
-import com.xbxie.mall.admin.vo.UserPageVo;
-import com.xbxie.mall.admin.vo.UserUpdateVo;
+import com.xbxie.mall.admin.vo.*;
 import com.xbxie.mall.common.utils.CustomException;
 import com.xbxie.mall.common.utils.PageData;
 import com.xbxie.mall.common.utils.R;
 import com.xbxie.mall.common.utils.ValidationUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -35,7 +33,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @Transactional
     @Override
-    public R add(UserAddVo userAddVo) {
+    public R<Void> add(UserAddVo userAddVo) {
         // 用户名或者用户账号重复
         List<UserEntity> list = this.list(new QueryWrapper<UserEntity>().eq("name", userAddVo.getName()).or().eq("account", userAddVo.getAccount()));
         if (!CollectionUtils.isEmpty(list)) {
@@ -52,6 +50,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             userAddVo.setStatus(1);
         }
 
+        // 编码密码
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        userAddVo.setPassword(encoder.encode(userAddVo.getPassword().trim()));
 
         // 插入用户
         UserEntity userEntity = new UserEntity();
@@ -84,7 +85,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @Transactional
     @Override
-    public R del(Long id) {
+    public R<Void> del(Long id) {
         // 用户不存在
         if (!this.exists(new QueryWrapper<UserEntity>().eq("id", id))) {
             return R.fail("用户不存在");
@@ -110,7 +111,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @Transactional
     @Override
-    public R updateUser(UserUpdateVo userUpdateVo) {
+    public R<Void> updateUser(UserUpdateVo userUpdateVo) {
 
         // 更新的用户不存在
         Long id = userUpdateVo.getId();
@@ -137,6 +138,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         if (!ValidationUtils.statusPass(userUpdateVo.getStatus())) {
             userUpdateVo.setStatus(1);
         }
+
+        // 编码密码
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        userUpdateVo.setPassword(encoder.encode(userUpdateVo.getPassword().trim()));
 
         UserEntity userEntity = new UserEntity();
         BeanUtils.copyProperties(userUpdateVo, userEntity);
@@ -181,6 +186,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
         Page<UserEntity> res = this.page(new Page<>(userPageVo.getPageNum(), userPageVo.getPageSize()), wrapper);
         PageData<UserEntity> pageData = PageData.getPageData(res);
+        pageData.getList().forEach(userEntity -> userEntity.setPassword(null));
         return R.success(pageData);
     }
 }

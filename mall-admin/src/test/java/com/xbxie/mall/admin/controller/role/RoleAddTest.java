@@ -1,23 +1,16 @@
 package com.xbxie.mall.admin.controller.role;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.xbxie.mall.admin.entity.RoleEntity;
 import com.xbxie.mall.admin.entity.RoleMenuRelEntity;
-import com.xbxie.mall.admin.entity.UserEntity;
-import com.xbxie.mall.admin.entity.UserRoleRelEntity;
 import com.xbxie.mall.admin.service.RoleMenuRelService;
 import com.xbxie.mall.admin.service.RoleService;
-import com.xbxie.mall.admin.service.impl.RoleServiceImpl;
 import com.xbxie.mall.admin.utils.TestUtils;
 import com.xbxie.mall.admin.vo.RoleAddVo;
-import com.xbxie.mall.admin.vo.UserAddVo;
-import com.xbxie.mall.common.utils.R;
 import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.CollectionUtils;
@@ -25,7 +18,6 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * 测试新增角色接口

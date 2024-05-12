@@ -1,7 +1,6 @@
 package com.xbxie.mall.admin.controller.user;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.xbxie.mall.admin.entity.UserEntity;
 import com.xbxie.mall.admin.entity.UserRoleRelEntity;
 import com.xbxie.mall.admin.service.UserRoleRelService;

@@ -1,15 +1,7 @@
 package com.xbxie.mall.admin.controller.menu;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.xbxie.mall.admin.entity.MenuEntity;
-import com.xbxie.mall.admin.entity.RoleEntity;
-import com.xbxie.mall.admin.entity.RoleMenuRelEntity;
-import com.xbxie.mall.admin.entity.UserEntity;
 import com.xbxie.mall.admin.service.MenuService;
-import com.xbxie.mall.admin.service.RoleService;
-import com.xbxie.mall.admin.service.impl.RoleMenuRelServiceImpl;
-import com.xbxie.mall.admin.service.impl.RoleServiceImpl;
 import com.xbxie.mall.admin.utils.TestUtils;
 import com.xbxie.mall.admin.vo.*;
 import org.assertj.core.util.Arrays;
@@ -19,10 +11,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
-import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 测试更新菜单接口
@@ -51,7 +41,7 @@ public class MenuUpdateTest {
         menuUpdateVo.setId(random.nextLong());
         menuUpdateVo.setPid(null);
         menuUpdateVo.setName(random.nextLong() + "");
-        menuUpdateVo.setUrl("/" + random.nextLong());
+        menuUpdateVo.setPath("/" + random.nextLong());
 
         return menuUpdateVo;
     }
@@ -66,7 +56,7 @@ public class MenuUpdateTest {
             menuEntity.setId(null);
             menuEntity.setPid(null);
             menuEntity.setName(i + "");
-            menuEntity.setUrl("/" + i);
+            menuEntity.setPath("/" + i);
             menuEntity.setIsDel(0);
             menuEntity.setCreateTime(null);
             menuEntity.setUpdateTime(null);
@@ -95,7 +85,7 @@ public class MenuUpdateTest {
         menuUpdateVo.setId(menuEntity1Before.getId());
         menuUpdateVo.setPid(menuEntity2Before.getId());
         menuUpdateVo.setName(newMenuUpdateVo.getName());
-        menuUpdateVo.setUrl(newMenuUpdateVo.getUrl());
+        menuUpdateVo.setPath(newMenuUpdateVo.getPath());
 
         Thread.sleep(1000);
         testUtils.assertSuccess(url, menuUpdateVo,"更新菜单成功");
@@ -108,7 +98,7 @@ public class MenuUpdateTest {
         // name
         Assertions.assertEquals(menuUpdateVo.getName(), menuEntity1After.getName());
         // url
-        Assertions.assertEquals(menuUpdateVo.getUrl(), menuEntity1After.getUrl());
+        Assertions.assertEquals(menuUpdateVo.getPath(), menuEntity1After.getPath());
         // idDel
         Assertions.assertEquals(menuEntity1Before.getIsDel(), menuEntity1After.getIsDel());
         // createTime
@@ -124,7 +114,7 @@ public class MenuUpdateTest {
         MenuEntity menuEntity2 = this.menuEntities.get(1);
         MenuUpdateVo menuUpdateVo = new MenuUpdateVo();
         BeanUtils.copyProperties(menuEntity1, menuUpdateVo);
-        menuUpdateVo.setUrl(menuEntity2.getUrl());
+        menuUpdateVo.setPath(menuEntity2.getPath());
 
         testUtils.simplePerformAssert(url, menuUpdateVo, 500, "菜单路径重复");
     }
@@ -182,7 +172,7 @@ public class MenuUpdateTest {
                     menuUpdateVo.setId(this.menuIds.get(0));
                     menuUpdateVo.setPid(null);
                     menuUpdateVo.setName(name);
-                    menuUpdateVo.setUrl(url);
+                    menuUpdateVo.setPath(url);
                     menuUpdateVos.add(menuUpdateVo);
                 }
 

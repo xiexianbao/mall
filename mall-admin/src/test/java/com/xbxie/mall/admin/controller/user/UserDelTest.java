@@ -1,7 +1,6 @@
 package com.xbxie.mall.admin.controller.user;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.xbxie.mall.admin.entity.UserEntity;
 import com.xbxie.mall.admin.entity.UserRoleRelEntity;
 import com.xbxie.mall.admin.service.UserRoleRelService;
@@ -11,12 +10,8 @@ import com.xbxie.mall.common.utils.R;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 /**
  * 测试删除用户接口
@@ -87,7 +82,7 @@ public class UserDelTest {
     void del() {
         Long userId = this.userIds.stream().findAny().get();
 
-        R resData = testUtils.getResData(url + "/" + userId, null);
+        R<Void> resData = testUtils.getResData(url + "/" + userId, null);
 
         // 进行返回结果
         Assertions.assertEquals(0, resData.getCode());

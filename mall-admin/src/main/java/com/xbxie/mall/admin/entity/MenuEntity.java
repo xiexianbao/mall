@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 
 /**
@@ -34,7 +31,7 @@ public class MenuEntity {
     /**
      * 菜单路径
      */
-    private String url;
+    private String path;
 
     /**
      * 是否删除 0：未删除，1：已删除

@@ -7,6 +7,10 @@ spring:
     password: root
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://192.168.1.8:3306/mall?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
+  redis:
+    host: 192.168.1.8
+    port: 6379
+    database: 0
 
 mybatis-plus:
   global-config:
@@ -17,10 +21,6 @@ mybatis-plus:
     enable-sql-runner: true # 开启 SqlRunner 以便执行原生 SQL
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #配置控制台打印完整带参数SQL语句
-
-#mybatis-plus:
-#  configuration:
-#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #配置控制台打印完整带参数SQL语句
 
 
 logging:
