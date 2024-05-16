@@ -7,9 +7,7 @@ import com.xbxie.mall.admin.entity.*;
 import com.xbxie.mall.admin.mapper.MenuMapper;
 import com.xbxie.mall.admin.service.MenuService;
 import com.xbxie.mall.admin.service.RoleMenuRelService;
-import com.xbxie.mall.admin.vo.MenuAddVo;
-import com.xbxie.mall.admin.vo.MenuPageVo;
-import com.xbxie.mall.admin.vo.MenuUpdateVo;
+import com.xbxie.mall.admin.vo.*;
 import com.xbxie.mall.common.utils.CustomException;
 import com.xbxie.mall.common.utils.PageData;
 import com.xbxie.mall.common.utils.R;
@@ -33,7 +31,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, MenuEntity> impleme
 
     @Override
     public R<Void> add(MenuAddVo menuAddVo) {
-        List<MenuEntity> list = this.list(new QueryWrapper<MenuEntity>().eq("name", menuAddVo.getName()).or().eq("url", menuAddVo.getPath()));
+        List<MenuEntity> list = this.list(new QueryWrapper<MenuEntity>().eq("name", menuAddVo.getName()).or().eq("path", menuAddVo.getPath()));
 
         if (!CollectionUtils.isEmpty(list)) {
             if (list.stream().anyMatch(item -> Objects.equals(item.getName(), menuAddVo.getName()))) {
@@ -102,7 +100,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, MenuEntity> impleme
         List<MenuEntity> list = this.list(
             new QueryWrapper<MenuEntity>()
                 .ne("id", id)
-                .and(i -> i.eq("name", menuUpdateVo.getName()).or().eq("url", menuUpdateVo.getPath()))
+                .and(i -> i.eq("name", menuUpdateVo.getName()).or().eq("path", menuUpdateVo.getPath()))
         );
         if (!CollectionUtils.isEmpty(list)) {
             if (list.stream().anyMatch(item -> Objects.equals(item.getName(), menuUpdateVo.getName()))) {
@@ -122,5 +120,17 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, MenuEntity> impleme
         }
 
         return R.success("更新菜单成功");
+    }
+
+    @Override
+    public R<MenuDetailVo> getMenu(Long id) {
+        MenuEntity menuEntity = this.getById(id);
+        if (menuEntity == null) {
+            throw new CustomException("菜单不存在");
+        }
+
+        MenuDetailVo menuDetailVo = new MenuDetailVo();
+        BeanUtils.copyProperties(menuEntity, menuDetailVo);
+        return R.success(menuDetailVo);
     }
 }

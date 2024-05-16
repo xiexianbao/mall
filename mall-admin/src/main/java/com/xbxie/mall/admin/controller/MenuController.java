@@ -39,4 +39,9 @@ public class MenuController {
     public R<PageData<MenuEntity>> pageList(@Validated @RequestBody MenuPageVo menuPageVo) {
         return menuService.pageList(menuPageVo);
     }
+
+    @PostMapping("/{id}")
+    public R<MenuDetailVo> getMenu(@PathVariable("id") Long id) {
+        return menuService.getMenu(id);
+    }
 }

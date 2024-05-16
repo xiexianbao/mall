@@ -2,6 +2,8 @@ package com.xbxie.mall.admin.vo;
 
 import lombok.Data;
 
+import java.util.List;
+
 
 /**
  * created by xbxie on 2024/5/13
@@ -13,24 +15,26 @@ public class LoginResVo {
      */
     private String token;
 
-
     /**
-     * 用户id
+     * 用户信息
      */
-    private Long id;
+    private User user;
 
-    /**
-     * 用户名
-     */
-    private String name;
+    @Data
+    public static class User {
+        /**
+         * 用户id
+         */
+        private Long id;
 
-    /**
-     * 用户账号
-     */
-    private String account;
+        /**
+         * 用户名
+         */
+        private String name;
 
-    /**
-     * 账号密码
-     */
-    private String password;
+        /**
+         * 用户账号
+         */
+        private String account;
+    }
 }

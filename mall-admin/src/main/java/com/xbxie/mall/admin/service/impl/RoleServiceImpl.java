@@ -5,12 +5,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xbxie.mall.admin.entity.RoleEntity;
 import com.xbxie.mall.admin.entity.RoleMenuRelEntity;
+import com.xbxie.mall.admin.entity.UserEntity;
 import com.xbxie.mall.admin.mapper.RoleMapper;
 import com.xbxie.mall.admin.service.RoleMenuRelService;
 import com.xbxie.mall.admin.service.RoleService;
-import com.xbxie.mall.admin.vo.RoleAddVo;
-import com.xbxie.mall.admin.vo.RolePageVo;
-import com.xbxie.mall.admin.vo.RoleUpdateVo;
+import com.xbxie.mall.admin.vo.*;
 import com.xbxie.mall.common.utils.CustomException;
 import com.xbxie.mall.common.utils.PageData;
 import com.xbxie.mall.common.utils.R;
@@ -150,5 +149,18 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> impleme
         Page<RoleEntity> res = this.page(new Page<>(rolePageVo.getPageNum(), rolePageVo.getPageSize()), wrapper);
         PageData<RoleEntity> pageData = PageData.getPageData(res);
         return R.success(pageData);
+    }
+
+    @Override
+    public R<RoleDetailVo> getRole(Long id) {
+        RoleEntity roleEntity = this.getById(id);
+        if (roleEntity == null) {
+            throw new CustomException("角色不存在");
+        }
+
+        RoleDetailVo roleDetailVo = new RoleDetailVo();
+        BeanUtils.copyProperties(roleEntity, roleDetailVo);
+        // TODO: 设置 menuIdList 的值
+        return R.success(roleDetailVo);
     }
 }

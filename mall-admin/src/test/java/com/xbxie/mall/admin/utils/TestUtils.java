@@ -193,6 +193,10 @@ public class TestUtils {
         simplePerformAssert(url, payload, 0, message);
     }
 
+    public void assertSuccess(String url, Object payload, HttpHeaders httpHeaders, String message) {
+        simplePerformAssert(url, payload, httpHeaders,0, message);
+    }
+
     /**
      * @param url
      * @param payload
@@ -200,6 +204,10 @@ public class TestUtils {
      */
     public void assertFail(String url, Object payload, String message) {
         simplePerformAssert(url, payload, 500, message);
+    }
+
+    public void assertFail(String url, Object payload, HttpHeaders httpHeaders, String message) {
+        simplePerformAssert(url, payload, httpHeaders, 500, message);
     }
 
     /**

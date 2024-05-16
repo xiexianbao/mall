@@ -11,4 +11,8 @@ public interface UserService extends IService<UserEntity> {
     R<Void> del(Long id);
     R<Void> updateUser(UserUpdateVo userUpdateVo);
     R<PageData<UserEntity>> pageList(UserPageVo userPageVo);
+
+    R<Void> changeStatus(UserStatusVo userStatusVo);
+
+    R<UserDetailVo> getUser(Long id);
 }

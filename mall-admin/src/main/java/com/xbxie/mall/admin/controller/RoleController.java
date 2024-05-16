@@ -39,4 +39,9 @@ public class RoleController {
     public R<PageData<RoleEntity>> pageList(@Validated @RequestBody RolePageVo rolePageVo) {
         return roleService.pageList(rolePageVo);
     }
+
+    @PostMapping("/{id}")
+    public R<RoleDetailVo> getRole(@PathVariable("id") Long id) {
+        return roleService.getRole(id);
+    }
 }

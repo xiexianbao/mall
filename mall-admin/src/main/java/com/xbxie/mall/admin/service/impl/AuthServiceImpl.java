@@ -50,11 +50,16 @@ public class AuthServiceImpl implements AuthService {
             throw new CustomException("密码错误");
         }
 
+
         // 生成 token ，并存入 redis
-        String token = JwtUtils.createToken(userEntity);
         LoginResVo loginResVo = new LoginResVo();
+
+        String token = JwtUtils.createToken(userEntity);
+        LoginResVo.User user = new LoginResVo.User();
+        BeanUtils.copyProperties(userEntity, user);
+
         loginResVo.setToken(token);
-        BeanUtils.copyProperties(userEntity, loginResVo);
+        loginResVo.setUser(user);
         stringRedisTemplate.opsForValue().set(userEntity.getId().toString(), token);
 
         return R.success(loginResVo);

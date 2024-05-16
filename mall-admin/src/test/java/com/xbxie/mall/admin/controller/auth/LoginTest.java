@@ -36,6 +36,11 @@ public class LoginTest {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
+    @Test
+    void foo() {
+        System.out.println(new BCryptPasswordEncoder().encode("123456"));
+    }
+
 
     @DisplayName("登录接口")
     @Test

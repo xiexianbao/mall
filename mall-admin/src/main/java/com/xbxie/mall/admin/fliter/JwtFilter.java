@@ -26,6 +26,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "*");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setHeader("Access-Control-Allow-Headers", "*");
+
+
         String token = request.getHeader("token");
         System.out.println("doFilterInternal:" + token);
         // 没有传 token，直接放行
@@ -50,6 +57,11 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         UserEntity userEntity1 = userService.getById(id);
+        if (userEntity1 == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userEntity1.getAccount(), userEntity1.getPassword(), null);
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authentication);

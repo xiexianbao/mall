@@ -139,9 +139,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             userUpdateVo.setStatus(1);
         }
 
-        // 编码密码
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        userUpdateVo.setPassword(encoder.encode(userUpdateVo.getPassword().trim()));
+        // 设置密码
+        if (userUpdateVo.getPassword().equals(this.getById(userUpdateVo.getId()).getPassword())) {
+            userUpdateVo.setPassword(null);
+        } else {
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            userUpdateVo.setPassword(encoder.encode(userUpdateVo.getPassword().trim()));
+        }
 
         UserEntity userEntity = new UserEntity();
         BeanUtils.copyProperties(userUpdateVo, userEntity);
@@ -181,12 +185,44 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             wrapper.like("name", name);
         }
         if (StringUtils.hasLength(account)) {
-            wrapper.or().like("account", account);
+            wrapper.like("account", account);
         }
 
         Page<UserEntity> res = this.page(new Page<>(userPageVo.getPageNum(), userPageVo.getPageSize()), wrapper);
         PageData<UserEntity> pageData = PageData.getPageData(res);
         pageData.getList().forEach(userEntity -> userEntity.setPassword(null));
         return R.success(pageData);
+    }
+
+    @Override
+    public R<Void> changeStatus(UserStatusVo userStatusVo) {
+        UserEntity userEntity = this.getById(userStatusVo.getId());
+        if (userEntity == null) {
+            return R.fail("用户不存在");
+        }
+
+        // 合法化 status 的值
+        if (!ValidationUtils.statusPass(userStatusVo.getStatus())) {
+            userStatusVo.setStatus(1);
+        }
+
+        BeanUtils.copyProperties(userStatusVo, userEntity);
+
+        this.updateById(userEntity);
+
+        return this.updateById(userEntity) ? R.success() : R.fail();
+    }
+
+    @Override
+    public R<UserDetailVo> getUser(Long id) {
+        UserEntity userEntity = this.getById(id);
+        if (userEntity == null) {
+            throw new CustomException("用户不存在");
+        }
+
+        UserDetailVo userDetailVo = new UserDetailVo();
+        BeanUtils.copyProperties(userEntity, userDetailVo);
+        // TODO: 设置 roleIdList 的值
+        return R.success(userDetailVo);
     }
 }

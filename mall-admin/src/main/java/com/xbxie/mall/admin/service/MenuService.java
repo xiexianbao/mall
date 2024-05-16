@@ -3,6 +3,7 @@ package com.xbxie.mall.admin.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.xbxie.mall.admin.entity.MenuEntity;
 import com.xbxie.mall.admin.vo.MenuAddVo;
+import com.xbxie.mall.admin.vo.MenuDetailVo;
 import com.xbxie.mall.admin.vo.MenuPageVo;
 import com.xbxie.mall.admin.vo.MenuUpdateVo;
 import com.xbxie.mall.common.utils.PageData;
@@ -19,4 +20,6 @@ public interface MenuService extends IService<MenuEntity> {
     R<PageData<MenuEntity>> pageList(MenuPageVo menuPageVo);
 
     R<Void> updateMenu(MenuUpdateVo menuUpdateVo);
+
+    R<MenuDetailVo> getMenu(Long id);
 }

@@ -40,4 +40,14 @@ public class UserController {
     public R<PageData<UserEntity>> pageList(@Validated @RequestBody UserPageVo userPageVo) {
         return userService.pageList(userPageVo);
     }
+
+    @PostMapping("/status")
+    public R<Void> changeStatus(@Validated @RequestBody UserStatusVo userStatusVo) {
+        return userService.changeStatus(userStatusVo);
+    }
+
+    @PostMapping("/{id}")
+    public R<UserDetailVo> getUser(@PathVariable("id") Long id) {
+        return userService.getUser(id);
+    }
 }
