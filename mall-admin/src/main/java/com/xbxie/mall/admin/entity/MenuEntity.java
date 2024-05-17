@@ -1,12 +1,11 @@
 package com.xbxie.mall.admin.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
+
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -14,11 +13,14 @@ import java.time.LocalDateTime;
  */
 @Data
 @TableName("ums_menu")
-public class MenuEntity {
+public class MenuEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     /**
      * 菜单id
      */
     @JsonSerialize(using = ToStringSerializer.class)
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**

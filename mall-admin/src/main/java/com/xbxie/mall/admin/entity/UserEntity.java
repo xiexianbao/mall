@@ -1,10 +1,9 @@
 package com.xbxie.mall.admin.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -16,9 +15,11 @@ import java.time.LocalDateTime;
 @TableName("ums_user")
 public class UserEntity implements Serializable {
     private static final long serialVersionUID = 1L;
+
     /**
      * 用户id
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     @TableId(type = IdType.AUTO)
     private Long id;
 

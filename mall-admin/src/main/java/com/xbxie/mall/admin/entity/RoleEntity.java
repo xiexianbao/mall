@@ -1,10 +1,9 @@
 package com.xbxie.mall.admin.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -12,7 +11,9 @@ import java.time.LocalDateTime;
  */
 @Data
 @TableName("ums_role")
-public class RoleEntity {
+public class RoleEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     /**
      * 角色id
      */

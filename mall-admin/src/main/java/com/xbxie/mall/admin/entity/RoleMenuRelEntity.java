@@ -3,6 +3,7 @@ package com.xbxie.mall.admin.entity;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -10,7 +11,9 @@ import java.time.LocalDateTime;
  */
 @Data
 @TableName("ums_role_menu_rel")
-public class RoleMenuRelEntity {
+public class RoleMenuRelEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     /**
      * id
      */
