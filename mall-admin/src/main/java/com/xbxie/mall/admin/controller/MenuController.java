@@ -1,13 +1,12 @@
 package com.xbxie.mall.admin.controller;
 
-import com.xbxie.mall.admin.entity.MenuEntity;
 import com.xbxie.mall.admin.service.MenuService;
 import com.xbxie.mall.admin.vo.*;
+import com.xbxie.mall.common.entity.CommonMenuEntity;
 import com.xbxie.mall.common.utils.PageData;
 import com.xbxie.mall.common.utils.R;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import javax.annotation.Resource;
 
 /**
@@ -36,7 +35,7 @@ public class MenuController {
     }
 
     @PostMapping("/pageList")
-    public R<PageData<MenuEntity>> pageList(@Validated @RequestBody MenuPageVo menuPageVo) {
+    public R<PageData<CommonMenuEntity>> pageList(@Validated @RequestBody MenuPageVo menuPageVo) {
         return menuService.pageList(menuPageVo);
     }
 

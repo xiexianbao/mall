@@ -1,8 +1,8 @@
 package com.xbxie.mall.admin.controller.role;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.xbxie.mall.admin.entity.RoleEntity;
-import com.xbxie.mall.admin.entity.RoleMenuRelEntity;
+import com.xbxie.mall.admin.entityback.RoleEntity;
+import com.xbxie.mall.admin.entityback.RoleMenuRelEntity;
 import com.xbxie.mall.admin.service.RoleService;
 import com.xbxie.mall.admin.service.impl.RoleMenuRelServiceImpl;
 import com.xbxie.mall.admin.utils.TestUtils;

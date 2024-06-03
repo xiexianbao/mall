@@ -2,14 +2,12 @@ package com.xbxie.mall.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.xbxie.mall.admin.entity.RoleEntity;
-import com.xbxie.mall.admin.entity.RoleMenuRelEntity;
-import com.xbxie.mall.admin.entity.UserEntity;
-import com.xbxie.mall.admin.mapper.RoleMapper;
-import com.xbxie.mall.admin.service.RoleMenuRelService;
 import com.xbxie.mall.admin.service.RoleService;
 import com.xbxie.mall.admin.vo.*;
+import com.xbxie.mall.common.entity.CommonRoleEntity;
+import com.xbxie.mall.common.entity.CommonRoleMenuRelEntity;
+import com.xbxie.mall.common.service.CommonRoleMenuRelService;
+import com.xbxie.mall.common.service.CommonRoleService;
 import com.xbxie.mall.common.utils.CustomException;
 import com.xbxie.mall.common.utils.PageData;
 import com.xbxie.mall.common.utils.R;
@@ -18,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,21 +24,24 @@ import java.util.stream.Collectors;
  * created by xbxie on 2024/4/25
  */
 @Service("roleService")
-public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> implements RoleService {
+public class RoleServiceImpl  implements RoleService {
     @Resource
-    private RoleMenuRelService roleMenuRelService;
+    private CommonRoleService commonRoleService;
+    
+    @Resource
+    private CommonRoleMenuRelService commonRoleMenuRelService;
 
     @Override
     public R<Void> add(RoleAddVo roleAddVo) {
         // 角色名重复
-        if (this.exists(new QueryWrapper<RoleEntity>().eq("name", roleAddVo.getName()))) {
+        if (commonRoleService.exists(new QueryWrapper<CommonRoleEntity>().eq("name", roleAddVo.getName()))) {
             return R.fail("角色名重复");
         }
 
         // 插入角色
-        RoleEntity roleEntity = new RoleEntity();
+        CommonRoleEntity roleEntity = new CommonRoleEntity();
         BeanUtils.copyProperties(roleAddVo, roleEntity);
-        if (!this.save(roleEntity)) {
+        if (!commonRoleService.save(roleEntity)) {
             return R.fail("添加角色失败");
         }
 
@@ -50,9 +50,9 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> impleme
         List<Long> menuIdList = roleAddVo.getMenuIdList();
         if (!CollectionUtils.isEmpty(menuIdList)) {
             if (
-                !roleMenuRelService.saveBatch(
+                !commonRoleMenuRelService.saveBatch(
                     menuIdList.stream().map(menuId -> {
-                        RoleMenuRelEntity roleMenuRelEntity = new RoleMenuRelEntity();
+                        CommonRoleMenuRelEntity roleMenuRelEntity = new CommonRoleMenuRelEntity();
                         roleMenuRelEntity.setRoleId(roleId);
                         roleMenuRelEntity.setMenuId(menuId);
                         return roleMenuRelEntity;
@@ -70,19 +70,19 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> impleme
     @Override
     public R<Void> del(Long id) {
         // 角色不存在
-        if (!this.exists(new QueryWrapper<RoleEntity>().eq("id", id))) {
+        if (!commonRoleService.exists(new QueryWrapper<CommonRoleEntity>().eq("id", id))) {
             return R.fail("角色不存在");
         }
 
         // 删除角色
-        if (!this.removeById(id)) {
+        if (!commonRoleService.removeById(id)) {
             return R.fail("删除角色失败");
         }
 
         // 删除角色菜单关系
-        QueryWrapper<RoleMenuRelEntity> wrapper = new QueryWrapper<RoleMenuRelEntity>().eq("role_id", id);
-        if (roleMenuRelService.exists(wrapper)) {
-            if (!roleMenuRelService.remove(wrapper)) {
+        QueryWrapper<CommonRoleMenuRelEntity> wrapper = new QueryWrapper<CommonRoleMenuRelEntity>().eq("role_id", id);
+        if (commonRoleMenuRelService.exists(wrapper)) {
+            if (!commonRoleMenuRelService.remove(wrapper)) {
                 throw new CustomException("删除角色菜单失败");
             }
         }
@@ -94,14 +94,14 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> impleme
     public R<Void> updateRole(RoleUpdateVo roleUpdateVo) {
         // 角色不存在
         Long id = roleUpdateVo.getId();
-        if (this.getById(id) == null) {
+        if (commonRoleService.getById(id) == null) {
             return R.fail("角色不存在");
         }
 
         // 角色名重复
         if (!CollectionUtils.isEmpty(
-            this.list(
-                new QueryWrapper<RoleEntity>()
+            commonRoleService.list(
+                new QueryWrapper<CommonRoleEntity>()
                     .ne("id", id)
                     .and(i -> i.eq("name", roleUpdateVo.getName()))
             )
@@ -109,22 +109,22 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> impleme
             return R.fail("角色名重复");
         }
 
-        RoleEntity roleEntity = new RoleEntity();
+        CommonRoleEntity roleEntity = new CommonRoleEntity();
         BeanUtils.copyProperties(roleUpdateVo, roleEntity);
 
-        if (!this.updateById(roleEntity)) {
-            R.fail("更新角色失败");
+        if (!commonRoleService.updateById(roleEntity)) {
+            return R.fail("更新角色失败");
         }
 
         // 更新角色的菜单
         // 先删除角色的旧菜单
-        this.roleMenuRelService.remove(new QueryWrapper<RoleMenuRelEntity>().eq("role_id", id));
+        commonRoleMenuRelService.remove(new QueryWrapper<CommonRoleMenuRelEntity>().eq("role_id", id));
         // 添加新菜单
         List<Long> menuIdList = roleUpdateVo.getMenuIdList();
         if (!CollectionUtils.isEmpty(menuIdList)) {
             if (
-                !roleMenuRelService.saveBatch(menuIdList.stream().map(menuId -> {
-                    RoleMenuRelEntity roleMenuRelEntity = new RoleMenuRelEntity();
+                !commonRoleMenuRelService.saveBatch(menuIdList.stream().map(menuId -> {
+                    CommonRoleMenuRelEntity roleMenuRelEntity = new CommonRoleMenuRelEntity();
                     roleMenuRelEntity.setRoleId(id);
                     roleMenuRelEntity.setMenuId(menuId);
                     return roleMenuRelEntity;
@@ -138,22 +138,22 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> impleme
     }
 
     @Override
-    public R<PageData<RoleEntity>> pageList(RolePageVo rolePageVo) {
+    public R<PageData<CommonRoleEntity>> pageList(RolePageVo rolePageVo) {
         String name = rolePageVo.getName();
 
-        QueryWrapper<RoleEntity> wrapper = new QueryWrapper<>();
+        QueryWrapper<CommonRoleEntity> wrapper = new QueryWrapper<>();
         if (StringUtils.hasLength(name)) {
             wrapper.like("name", name);
         }
 
-        Page<RoleEntity> res = this.page(new Page<>(rolePageVo.getPageNum(), rolePageVo.getPageSize()), wrapper);
-        PageData<RoleEntity> pageData = PageData.getPageData(res);
+        Page<CommonRoleEntity> res = commonRoleService.page(new Page<>(rolePageVo.getPageNum(), rolePageVo.getPageSize()), wrapper);
+        PageData<CommonRoleEntity> pageData = PageData.getPageData(res);
         return R.success(pageData);
     }
 
     @Override
     public R<RoleDetailVo> getRole(Long id) {
-        RoleEntity roleEntity = this.getById(id);
+        CommonRoleEntity roleEntity = commonRoleService.getById(id);
         if (roleEntity == null) {
             throw new CustomException("角色不存在");
         }

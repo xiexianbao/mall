@@ -1,8 +1,8 @@
 package com.xbxie.mall.admin.controller.user;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.xbxie.mall.admin.entity.UserEntity;
-import com.xbxie.mall.admin.entity.UserRoleRelEntity;
+import com.xbxie.mall.admin.entityback.UserEntity;
+import com.xbxie.mall.admin.entityback.UserRoleRelEntity;
 import com.xbxie.mall.admin.service.UserRoleRelService;
 import com.xbxie.mall.admin.service.UserService;
 import com.xbxie.mall.admin.utils.TestUtils;
@@ -86,7 +86,7 @@ public class UserDelTest {
 
         // 进行返回结果
         Assertions.assertEquals(0, resData.getCode());
-        Assertions.assertEquals("删除用户成功", resData.getMessage());
+        Assertions.assertEquals("删除用户成功", resData.getMsg());
 
 
         // 验证数据库中的数据

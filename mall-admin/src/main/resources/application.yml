@@ -1,32 +1,3 @@
 server:
-  port: 8080
+  port: 8000
 
-spring:
-  datasource:
-    username: root
-    password: root
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://192.168.1.8:3306/mall?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
-  redis:
-    host: 192.168.1.8
-    port: 6379
-    database: 0
-  jackson:
-    date-format: yyyy-MM-dd HH:mm:ss
-
-mybatis-plus:
-  global-config:
-    db-config:
-      logic-delete-field: is_del # 全局逻辑删除的实体字段名
-      logic-delete-value: 1 # 逻辑已删除值
-      logic-not-delete-value: 0 # 逻辑未删除值
-    enable-sql-runner: true # 开启 SqlRunner 以便执行原生 SQL
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #配置控制台打印完整带参数SQL语句
-
-
-logging:
-  file:
-#    path 和 name 不能同时生效
-#    path: C:\Users\Administrator\Desktop\project\log
-    name: C:\Users\Administrator\Desktop\project\log\index.log

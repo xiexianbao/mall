@@ -3,8 +3,21 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/mall-admin/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mall-admin/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mall-auth/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mall-auth/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mall-cart/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mall-cart/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mall-common/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mall-common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mall-gateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mall-gateway/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mall-member/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mall-member/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mall-order/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mall-order/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mall-product/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mall-thirdpart/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mall-thirdpart/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
   </component>

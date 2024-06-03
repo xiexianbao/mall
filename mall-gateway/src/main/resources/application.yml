@@ -1,0 +1,50 @@
+server:
+  port: 8080
+
+spring:
+  main:
+    web-application-type: reactive
+  cloud:
+    gateway:
+      routes:
+        - id: auth_route
+          uri: lb://mall-auth
+          predicates:
+            - Path=/auth/**
+          filters:
+            - RewritePath=/auth/(?<segment>/?.*),/$\{segment}
+
+        - id: admin_route
+          uri: lb://mall-admin
+          predicates:
+            - Path=/admin/**
+          filters:
+            - RewritePath=/admin/(?<segment>/?.*),/$\{segment}
+
+        - id: product_route
+          uri: lb://mall-product
+          predicates:
+            - Path=/product/**
+          filters:
+            - RewritePath=/product/(?<segment>/?.*),/$\{segment}
+
+        - id: order_route
+          uri: lb://mall-order
+          predicates:
+            - Path=/order/**
+          filters:
+            - RewritePath=/order/(?<segment>/?.*),/$\{segment}
+
+        - id: member_route
+          uri: lb://mall-member
+          predicates:
+            - Path=/member/**
+          filters:
+            - RewritePath=/member/(?<segment>/?.*),/$\{segment}
+
+        - id: thirdpart_route
+          uri: lb://mall-thirdpart
+          predicates:
+            - Path=/thirdpart/**
+          filters:
+            - RewritePath=/thirdpart/(?<segment>/?.*),/$\{segment}

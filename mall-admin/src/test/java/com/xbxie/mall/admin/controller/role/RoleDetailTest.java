@@ -2,9 +2,8 @@ package com.xbxie.mall.admin.controller.role;
 
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.xbxie.mall.admin.entity.RoleEntity;
-import com.xbxie.mall.admin.entity.UserEntity;
-import com.xbxie.mall.admin.service.AuthService;
+import com.xbxie.mall.admin.entityback.RoleEntity;
+import com.xbxie.mall.admin.entityback.UserEntity;
 import com.xbxie.mall.admin.service.RoleService;
 import com.xbxie.mall.admin.service.UserService;
 import com.xbxie.mall.admin.utils.TestUtils;

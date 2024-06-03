@@ -2,9 +2,6 @@ package com.xbxie.mall.admin.vo;
 
 import lombok.Data;
 
-import java.util.List;
-
-
 /**
  * created by xbxie on 2024/5/13
  */

@@ -41,4 +41,15 @@ public class PageData<E> {
 
         return pageData;
     }
+
+    public static <T> PageData<T> getPageData(Long pageNum, Long pageSize, Long total, List<T> list) {
+        PageData<T> pageData = new PageData<>();
+
+        pageData.setPageNum(pageNum);
+        pageData.setPageSize(pageSize);
+        pageData.setList(list);
+        pageData.setTotal(total);
+
+        return pageData;
+    }
 }

@@ -1,8 +1,8 @@
 package com.xbxie.mall.admin.controller.user;
 
 import com.alibaba.fastjson.TypeReference;
-import com.xbxie.mall.admin.entity.UserEntity;
-import com.xbxie.mall.admin.entity.UserRoleRelEntity;
+import com.xbxie.mall.admin.entityback.UserEntity;
+import com.xbxie.mall.admin.entityback.UserRoleRelEntity;
 import com.xbxie.mall.admin.service.UserRoleRelService;
 import com.xbxie.mall.admin.service.UserService;
 import com.xbxie.mall.admin.utils.TestUtils;
@@ -97,7 +97,7 @@ public class UserPageTest {
         R<PageData<UserEntity>> resData = testUtils.getResData(url, userPageVo, new TypeReference<R<PageData<UserEntity>>>() {});
 
         Assertions.assertEquals(0, resData.getCode());
-        Assertions.assertEquals("success", resData.getMessage());
+        Assertions.assertEquals("success", resData.getMsg());
         Assertions.assertEquals(1, resData.getData().getPageNum());
         Assertions.assertEquals(10, resData.getData().getPageSize());
         Assertions.assertEquals(10, resData.getData().getList().size());

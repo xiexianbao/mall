@@ -1,13 +1,8 @@
 package com.xbxie.mall.admin.controller.user;
 
-import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.xbxie.mall.admin.entity.UserEntity;
-import com.xbxie.mall.admin.entity.UserRoleRelEntity;
-import com.xbxie.mall.admin.service.AuthService;
-import com.xbxie.mall.admin.service.UserRoleRelService;
+import com.xbxie.mall.admin.entityback.UserEntity;
 import com.xbxie.mall.admin.service.UserService;
-import com.xbxie.mall.admin.utils.JwtUtils;
 import com.xbxie.mall.admin.utils.TestUtils;
 import com.xbxie.mall.admin.vo.LoginReqVo;
 import com.xbxie.mall.admin.vo.LoginResVo;
@@ -19,11 +14,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpHeaders;
-import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * created by xbxie on 2024/5/15

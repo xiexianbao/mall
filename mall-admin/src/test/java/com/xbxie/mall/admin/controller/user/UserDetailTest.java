@@ -2,14 +2,12 @@ package com.xbxie.mall.admin.controller.user;
 
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.xbxie.mall.admin.entity.UserEntity;
-import com.xbxie.mall.admin.service.AuthService;
+import com.xbxie.mall.admin.entityback.UserEntity;
 import com.xbxie.mall.admin.service.UserService;
 import com.xbxie.mall.admin.utils.TestUtils;
 import com.xbxie.mall.admin.vo.LoginReqVo;
 import com.xbxie.mall.admin.vo.LoginResVo;
 import com.xbxie.mall.admin.vo.UserAddVo;
-import com.xbxie.mall.admin.vo.UserStatusVo;
 import com.xbxie.mall.common.utils.R;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

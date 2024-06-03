@@ -2,12 +2,12 @@ package com.xbxie.mall.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.xbxie.mall.admin.entity.*;
-import com.xbxie.mall.admin.mapper.MenuMapper;
 import com.xbxie.mall.admin.service.MenuService;
-import com.xbxie.mall.admin.service.RoleMenuRelService;
 import com.xbxie.mall.admin.vo.*;
+import com.xbxie.mall.common.entity.CommonMenuEntity;
+import com.xbxie.mall.common.entity.CommonRoleMenuRelEntity;
+import com.xbxie.mall.common.service.CommonMenuService;
+import com.xbxie.mall.common.service.CommonRoleMenuRelService;
 import com.xbxie.mall.common.utils.CustomException;
 import com.xbxie.mall.common.utils.PageData;
 import com.xbxie.mall.common.utils.R;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
@@ -25,13 +24,16 @@ import java.util.Objects;
  * created by xbxie on 2024/4/25
  */
 @Service("menuService")
-public class MenuServiceImpl extends ServiceImpl<MenuMapper, MenuEntity> implements MenuService {
+public class MenuServiceImpl  implements MenuService {
     @Resource
-    private RoleMenuRelService roleMenuRelService;
+    private CommonMenuService commonMenuService;
+    
+    @Resource
+    private CommonRoleMenuRelService commonRoleMenuRelService;
 
     @Override
     public R<Void> add(MenuAddVo menuAddVo) {
-        List<MenuEntity> list = this.list(new QueryWrapper<MenuEntity>().eq("name", menuAddVo.getName()).or().eq("path", menuAddVo.getPath()));
+        List<CommonMenuEntity> list = commonMenuService.list(new QueryWrapper<CommonMenuEntity>().eq("name", menuAddVo.getName()).or().eq("path", menuAddVo.getPath()));
 
         if (!CollectionUtils.isEmpty(list)) {
             if (list.stream().anyMatch(item -> Objects.equals(item.getName(), menuAddVo.getName()))) {
@@ -42,29 +44,29 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, MenuEntity> impleme
             }
         }
 
-        MenuEntity menuEntity = new MenuEntity();
+        CommonMenuEntity menuEntity = new CommonMenuEntity();
         BeanUtils.copyProperties(menuAddVo, menuEntity);
-        return this.save(menuEntity) ? R.success("添加菜单成功") : R.fail("添加菜单失败");
+        return commonMenuService.save(menuEntity) ? R.success("添加菜单成功") : R.fail("添加菜单失败");
     }
 
     @Transactional
     @Override
     public R<Void> del(Long id) {
         // 菜单不存在
-        if (!this.exists(new QueryWrapper<MenuEntity>().eq("id", id))) {
+        if (!commonMenuService.exists(new QueryWrapper<CommonMenuEntity>().eq("id", id))) {
             return R.fail("菜单不存在");
         }
 
         // 删除菜单
-        if (!this.removeById(id)) {
+        if (!commonMenuService.removeById(id)) {
             return R.fail("删除菜单失败");
         }
 
 
-        // 删除菜单角色关系，这样之前拥有该菜单的角色就不在拥有该才当了
-        QueryWrapper<RoleMenuRelEntity> wrapper = new QueryWrapper<RoleMenuRelEntity>().eq("menu_id", id);
-        if (roleMenuRelService.exists(wrapper)) {
-            if (!roleMenuRelService.remove(wrapper)) {
+        // 删除菜单角色关系，这样之前拥有该菜单的角色就不在拥有该菜单了
+        QueryWrapper<CommonRoleMenuRelEntity> wrapper = new QueryWrapper<CommonRoleMenuRelEntity>().eq("menu_id", id);
+        if (commonRoleMenuRelService.exists(wrapper)) {
+            if (!commonRoleMenuRelService.remove(wrapper)) {
                 throw new CustomException("删除菜单角色失败");
             }
         }
@@ -74,16 +76,16 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, MenuEntity> impleme
     }
 
     @Override
-    public R<PageData<MenuEntity>> pageList(MenuPageVo menuPageVo) {
+    public R<PageData<CommonMenuEntity>> pageList(MenuPageVo menuPageVo) {
         String name = menuPageVo.getName();
 
-        QueryWrapper<MenuEntity> wrapper = new QueryWrapper<>();
+        QueryWrapper<CommonMenuEntity> wrapper = new QueryWrapper<>();
         if (StringUtils.hasLength(name)) {
             wrapper.like("name", name);
         }
 
-        Page<MenuEntity> res = this.page(new Page<>(menuPageVo.getPageNum(), menuPageVo.getPageSize()), wrapper);
-        PageData<MenuEntity> pageData = PageData.getPageData(res);
+        Page<CommonMenuEntity> res = commonMenuService.page(new Page<>(menuPageVo.getPageNum(), menuPageVo.getPageSize()), wrapper);
+        PageData<CommonMenuEntity> pageData = PageData.getPageData(res);
         return R.success(pageData);
     }
 
@@ -92,13 +94,13 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, MenuEntity> impleme
 
         // 更新的菜单不存在
         Long id = menuUpdateVo.getId();
-        if (this.getById(id) == null) {
+        if (commonMenuService.getById(id) == null) {
             return R.fail("菜单不存在");
         }
 
         // 菜单名/菜单路径重复
-        List<MenuEntity> list = this.list(
-            new QueryWrapper<MenuEntity>()
+        List<CommonMenuEntity> list = commonMenuService.list(
+            new QueryWrapper<CommonMenuEntity>()
                 .ne("id", id)
                 .and(i -> i.eq("name", menuUpdateVo.getName()).or().eq("path", menuUpdateVo.getPath()))
         );
@@ -112,11 +114,11 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, MenuEntity> impleme
         }
 
 
-        MenuEntity menuEntity = new MenuEntity();
+        CommonMenuEntity menuEntity = new CommonMenuEntity();
         BeanUtils.copyProperties(menuUpdateVo, menuEntity);
 
-        if (!this.updateById(menuEntity)) {
-            R.fail("更新菜单失败");
+        if (!commonMenuService.updateById(menuEntity)) {
+            return R.fail("更新菜单失败");
         }
 
         return R.success("更新菜单成功");
@@ -124,7 +126,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, MenuEntity> impleme
 
     @Override
     public R<MenuDetailVo> getMenu(Long id) {
-        MenuEntity menuEntity = this.getById(id);
+        CommonMenuEntity menuEntity = commonMenuService.getById(id);
         if (menuEntity == null) {
             throw new CustomException("菜单不存在");
         }

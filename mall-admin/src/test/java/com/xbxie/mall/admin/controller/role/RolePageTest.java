@@ -1,8 +1,8 @@
 package com.xbxie.mall.admin.controller.role;
 
 import com.alibaba.fastjson.TypeReference;
-import com.xbxie.mall.admin.entity.RoleEntity;
-import com.xbxie.mall.admin.entity.RoleMenuRelEntity;
+import com.xbxie.mall.admin.entityback.RoleEntity;
+import com.xbxie.mall.admin.entityback.RoleMenuRelEntity;
 import com.xbxie.mall.admin.service.RoleMenuRelService;
 import com.xbxie.mall.admin.service.RoleService;
 import com.xbxie.mall.admin.service.UserService;
@@ -96,7 +96,7 @@ public class RolePageTest {
         R<PageData<RoleEntity>> resData = testUtils.getResData(url, rolePageVo, new TypeReference<R<PageData<RoleEntity>>>() {});
 
         Assertions.assertEquals(0, resData.getCode());
-        Assertions.assertEquals("success", resData.getMessage());
+        Assertions.assertEquals("success", resData.getMsg());
         Assertions.assertEquals(1, resData.getData().getPageNum());
         Assertions.assertEquals(10, resData.getData().getPageSize());
         Assertions.assertEquals(10, resData.getData().getList().size());

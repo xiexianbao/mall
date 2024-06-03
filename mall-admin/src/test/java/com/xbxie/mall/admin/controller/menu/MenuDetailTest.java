@@ -2,10 +2,8 @@ package com.xbxie.mall.admin.controller.menu;
 
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.xbxie.mall.admin.entity.MenuEntity;
-import com.xbxie.mall.admin.entity.RoleEntity;
-import com.xbxie.mall.admin.entity.UserEntity;
-import com.xbxie.mall.admin.service.AuthService;
+import com.xbxie.mall.admin.entityback.MenuEntity;
+import com.xbxie.mall.admin.entityback.UserEntity;
 import com.xbxie.mall.admin.service.MenuService;
 import com.xbxie.mall.admin.service.RoleService;
 import com.xbxie.mall.admin.service.UserService;

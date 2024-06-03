@@ -1,7 +1,7 @@
 package com.xbxie.mall.admin.controller.menu;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.xbxie.mall.admin.entity.MenuEntity;
+import com.xbxie.mall.admin.entityback.MenuEntity;
 import com.xbxie.mall.admin.service.MenuService;
 import com.xbxie.mall.admin.utils.TestUtils;
 import com.xbxie.mall.common.utils.R;
@@ -67,7 +67,7 @@ public class MenuDelTest {
 
         // 进行返回结果
         Assertions.assertEquals(0, resData.getCode());
-        Assertions.assertEquals("删除菜单成功", resData.getMessage());
+        Assertions.assertEquals("删除菜单成功", resData.getMsg());
 
 
         // 验证数据库中的数据

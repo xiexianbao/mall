@@ -1,6 +1,6 @@
 package com.xbxie.mall.admin.controller.auth;
 
-import com.xbxie.mall.admin.entity.UserEntity;
+import com.xbxie.mall.admin.entityback.UserEntity;
 import com.xbxie.mall.admin.service.UserService;
 import com.xbxie.mall.admin.utils.TestUtils;
 import com.xbxie.mall.admin.vo.LoginReqVo;

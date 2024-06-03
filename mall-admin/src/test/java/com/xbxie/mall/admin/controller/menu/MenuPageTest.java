@@ -1,8 +1,8 @@
 package com.xbxie.mall.admin.controller.menu;
 
 import com.alibaba.fastjson.TypeReference;
-import com.xbxie.mall.admin.entity.MenuEntity;
-import com.xbxie.mall.admin.entity.UserEntity;
+import com.xbxie.mall.admin.entityback.MenuEntity;
+import com.xbxie.mall.admin.entityback.UserEntity;
 import com.xbxie.mall.admin.service.MenuService;
 import com.xbxie.mall.admin.utils.TestUtils;
 import com.xbxie.mall.admin.vo.MenuPageVo;
@@ -75,7 +75,7 @@ public class MenuPageTest {
         R<PageData<MenuEntity>> resData = testUtils.getResData(url, menuPageVo, new TypeReference<R<PageData<MenuEntity>>>() {});
 
         Assertions.assertEquals(0, resData.getCode());
-        Assertions.assertEquals("success", resData.getMessage());
+        Assertions.assertEquals("success", resData.getMsg());
         Assertions.assertEquals(1, resData.getData().getPageNum());
         Assertions.assertEquals(10, resData.getData().getPageSize());
         Assertions.assertEquals(10, resData.getData().getList().size());

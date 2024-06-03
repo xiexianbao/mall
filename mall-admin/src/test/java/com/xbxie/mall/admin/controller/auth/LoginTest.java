@@ -1,7 +1,7 @@
 package com.xbxie.mall.admin.controller.auth;
 
 import com.alibaba.fastjson.TypeReference;
-import com.xbxie.mall.admin.entity.UserEntity;
+import com.xbxie.mall.admin.entityback.UserEntity;
 import com.xbxie.mall.admin.service.UserService;
 import com.xbxie.mall.admin.utils.TestUtils;
 import com.xbxie.mall.admin.vo.LoginReqVo;
@@ -66,7 +66,7 @@ public class LoginTest {
         R<LoginResVo> resData = testUtils.getResData(url, loginReqVo, new TypeReference<R<LoginResVo>>() {});
 
         Assertions.assertEquals(0, resData.getCode());
-        Assertions.assertEquals("success", resData.getMessage());
+        Assertions.assertEquals("success", resData.getMsg());
         Assertions.assertNotNull(resData.getData().getToken());
 
         // 验证 token 缓存是否存在

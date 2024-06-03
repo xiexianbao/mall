@@ -1,13 +1,12 @@
 package com.xbxie.mall.admin.controller;
 
-import com.xbxie.mall.admin.entity.RoleEntity;
 import com.xbxie.mall.admin.service.RoleService;
 import com.xbxie.mall.admin.vo.*;
+import com.xbxie.mall.common.entity.CommonRoleEntity;
 import com.xbxie.mall.common.utils.PageData;
 import com.xbxie.mall.common.utils.R;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import javax.annotation.Resource;
 
 /**
@@ -36,7 +35,7 @@ public class RoleController {
     }
 
     @PostMapping("/pageList")
-    public R<PageData<RoleEntity>> pageList(@Validated @RequestBody RolePageVo rolePageVo) {
+    public R<PageData<CommonRoleEntity>> pageList(@Validated @RequestBody RolePageVo rolePageVo) {
         return roleService.pageList(rolePageVo);
     }
 

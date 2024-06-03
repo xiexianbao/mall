@@ -2,13 +2,12 @@ package com.xbxie.mall.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.xbxie.mall.admin.entity.UserEntity;
-import com.xbxie.mall.admin.entity.UserRoleRelEntity;
-import com.xbxie.mall.admin.mapper.UserMapper;
-import com.xbxie.mall.admin.service.UserRoleRelService;
 import com.xbxie.mall.admin.service.UserService;
 import com.xbxie.mall.admin.vo.*;
+import com.xbxie.mall.common.entity.CommonUserEntity;
+import com.xbxie.mall.common.entity.CommonUserRoleRelEntity;
+import com.xbxie.mall.common.service.CommonUserRoleRelService;
+import com.xbxie.mall.common.service.CommonUserService;
 import com.xbxie.mall.common.utils.CustomException;
 import com.xbxie.mall.common.utils.PageData;
 import com.xbxie.mall.common.utils.R;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
@@ -27,15 +25,18 @@ import java.util.stream.Collectors;
 
 
 @Service("userService")
-public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> implements UserService {
+public class UserServiceImpl implements UserService {
     @Resource
-    private UserRoleRelService userRoleRelService;
+    private CommonUserService commonUserService;
+
+    @Resource
+    private CommonUserRoleRelService commonUserRoleRelService;
 
     @Transactional
     @Override
     public R<Void> add(UserAddVo userAddVo) {
         // 用户名或者用户账号重复
-        List<UserEntity> list = this.list(new QueryWrapper<UserEntity>().eq("name", userAddVo.getName()).or().eq("account", userAddVo.getAccount()));
+        List<CommonUserEntity> list = commonUserService.list(new QueryWrapper<CommonUserEntity>().eq("name", userAddVo.getName()).or().eq("account", userAddVo.getAccount()));
         if (!CollectionUtils.isEmpty(list)) {
             if (list.stream().anyMatch(item -> Objects.equals(item.getName(), userAddVo.getName()))) {
                 return R.fail("用户名重复");
@@ -55,10 +56,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         userAddVo.setPassword(encoder.encode(userAddVo.getPassword().trim()));
 
         // 插入用户
-        UserEntity userEntity = new UserEntity();
+        CommonUserEntity userEntity = new CommonUserEntity();
         BeanUtils.copyProperties(userAddVo, userEntity);
 
-        if (!this.save(userEntity)) {
+        if (!commonUserService.save(userEntity)) {
             return R.fail("添加用户失败");
         }
 
@@ -67,9 +68,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         List<Long> roleIdList = userAddVo.getRoleIdList();
         if (!CollectionUtils.isEmpty(roleIdList)) {
             if (
-                !userRoleRelService.saveBatch(
+                !commonUserRoleRelService.saveBatch(
                     roleIdList.stream().map(roleId -> {
-                        UserRoleRelEntity userRoleRelEntity = new UserRoleRelEntity();
+                        CommonUserRoleRelEntity userRoleRelEntity = new CommonUserRoleRelEntity();
                         userRoleRelEntity.setUserId(userId);
                         userRoleRelEntity.setRoleId(roleId);
                         return userRoleRelEntity;
@@ -87,20 +88,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Override
     public R<Void> del(Long id) {
         // 用户不存在
-        if (!this.exists(new QueryWrapper<UserEntity>().eq("id", id))) {
+        if (!commonUserService.exists(new QueryWrapper<CommonUserEntity>().eq("id", id))) {
             return R.fail("用户不存在");
         }
 
         // 删除用户
-        if (!this.removeById(id)) {
+        if (!commonUserService.removeById(id)) {
             return R.fail("删除用户失败");
         }
 
 
         // 删除用户角色关系
-        QueryWrapper<UserRoleRelEntity> wrapper = new QueryWrapper<UserRoleRelEntity>().eq("user_id", id);
-        if (userRoleRelService.exists(wrapper)) {
-            if (!userRoleRelService.remove(wrapper)) {
+        QueryWrapper<CommonUserRoleRelEntity> wrapper = new QueryWrapper<CommonUserRoleRelEntity>().eq("user_id", id);
+        if (commonUserRoleRelService.exists(wrapper)) {
+            if (!commonUserRoleRelService.remove(wrapper)) {
                 throw new CustomException("删除用户角色失败");
             }
         }
@@ -115,13 +116,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
         // 更新的用户不存在
         Long id = userUpdateVo.getId();
-        if (this.getById(id) == null) {
+        if (commonUserService.getById(id) == null) {
             return R.fail("用户不存在");
         }
 
         // 用户名或者用户账号重复
-        List<UserEntity> list = this.list(
-            new QueryWrapper<UserEntity>()
+        List<CommonUserEntity> list = commonUserService.list(
+            new QueryWrapper<CommonUserEntity>()
                 .ne("id", id)
                 .and(i -> i.eq("name", userUpdateVo.getName()).or().eq("account", userUpdateVo.getAccount()))
         );
@@ -140,29 +141,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
 
         // 设置密码
-        if (userUpdateVo.getPassword().equals(this.getById(userUpdateVo.getId()).getPassword())) {
+        if (userUpdateVo.getPassword().equals(commonUserService.getById(userUpdateVo.getId()).getPassword())) {
             userUpdateVo.setPassword(null);
         } else {
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
             userUpdateVo.setPassword(encoder.encode(userUpdateVo.getPassword().trim()));
         }
 
-        UserEntity userEntity = new UserEntity();
+        CommonUserEntity userEntity = new CommonUserEntity();
         BeanUtils.copyProperties(userUpdateVo, userEntity);
 
-        if (!this.updateById(userEntity)) {
-            R.fail("更新用户失败");
+        if (!commonUserService.updateById(userEntity)) {
+            return R.fail("更新用户失败");
         }
 
         // 更新用户的角色
         // 先删除用户的旧角色
-        this.userRoleRelService.remove(new QueryWrapper<UserRoleRelEntity>().eq("user_id", id));
+        commonUserRoleRelService.remove(new QueryWrapper<CommonUserRoleRelEntity>().eq("user_id", id));
         // 添加新角色
         List<Long> roleIdList = userUpdateVo.getRoleIdList();
         if (!CollectionUtils.isEmpty(roleIdList)) {
             if (
-                !userRoleRelService.saveBatch(roleIdList.stream().map(roleId -> {
-                    UserRoleRelEntity userRoleRelEntity = new UserRoleRelEntity();
+                !commonUserRoleRelService.saveBatch(roleIdList.stream().map(roleId -> {
+                    CommonUserRoleRelEntity userRoleRelEntity = new CommonUserRoleRelEntity();
                     userRoleRelEntity.setUserId(id);
                     userRoleRelEntity.setRoleId(roleId);
                     return userRoleRelEntity;
@@ -176,11 +177,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     }
 
     @Override
-    public R<PageData<UserEntity>> pageList(UserPageVo userPageVo) {
+    public R<PageData<CommonUserEntity>> pageList(UserPageVo userPageVo) {
         String name = userPageVo.getName();
         String account = userPageVo.getAccount();
 
-        QueryWrapper<UserEntity> wrapper = new QueryWrapper<>();
+        QueryWrapper<CommonUserEntity> wrapper = new QueryWrapper<>();
         if (StringUtils.hasLength(name)) {
             wrapper.like("name", name);
         }
@@ -188,15 +189,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             wrapper.like("account", account);
         }
 
-        Page<UserEntity> res = this.page(new Page<>(userPageVo.getPageNum(), userPageVo.getPageSize()), wrapper);
-        PageData<UserEntity> pageData = PageData.getPageData(res);
+        Page<CommonUserEntity> res = commonUserService.page(new Page<>(userPageVo.getPageNum(), userPageVo.getPageSize()), wrapper);
+        PageData<CommonUserEntity> pageData = PageData.getPageData(res);
         pageData.getList().forEach(userEntity -> userEntity.setPassword(null));
         return R.success(pageData);
     }
 
     @Override
     public R<Void> changeStatus(UserStatusVo userStatusVo) {
-        UserEntity userEntity = this.getById(userStatusVo.getId());
+        CommonUserEntity userEntity = commonUserService.getById(userStatusVo.getId());
         if (userEntity == null) {
             return R.fail("用户不存在");
         }
@@ -208,14 +209,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
         BeanUtils.copyProperties(userStatusVo, userEntity);
 
-        this.updateById(userEntity);
-
-        return this.updateById(userEntity) ? R.success() : R.fail();
+        return commonUserService.updateById(userEntity) ? R.success() : R.fail();
     }
 
     @Override
     public R<UserDetailVo> getUser(Long id) {
-        UserEntity userEntity = this.getById(id);
+        CommonUserEntity userEntity = commonUserService.getById(id);
         if (userEntity == null) {
             throw new CustomException("用户不存在");
         }

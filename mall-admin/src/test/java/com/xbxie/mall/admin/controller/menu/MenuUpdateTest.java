@@ -1,6 +1,6 @@
 package com.xbxie.mall.admin.controller.menu;
 
-import com.xbxie.mall.admin.entity.MenuEntity;
+import com.xbxie.mall.admin.entityback.MenuEntity;
 import com.xbxie.mall.admin.service.MenuService;
 import com.xbxie.mall.admin.utils.TestUtils;
 import com.xbxie.mall.admin.vo.*;

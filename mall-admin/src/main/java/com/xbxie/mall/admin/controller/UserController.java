@@ -1,8 +1,8 @@
 package com.xbxie.mall.admin.controller;
 
-import com.xbxie.mall.admin.entity.UserEntity;
 import com.xbxie.mall.admin.service.UserService;
 import com.xbxie.mall.admin.vo.*;
+import com.xbxie.mall.common.entity.CommonUserEntity;
 import com.xbxie.mall.common.utils.PageData;
 import com.xbxie.mall.common.utils.R;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +37,7 @@ public class UserController {
     }
 
     @PostMapping("/pageList")
-    public R<PageData<UserEntity>> pageList(@Validated @RequestBody UserPageVo userPageVo) {
+    public R<PageData<CommonUserEntity>> pageList(@Validated @RequestBody UserPageVo userPageVo) {
         return userService.pageList(userPageVo);
     }
 

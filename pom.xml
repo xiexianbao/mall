@@ -21,14 +21,56 @@
         <mybatis-plus-version>3.5.6</mybatis-plus-version>
         <mysql-connector-version>5.1.49</mysql-connector-version>
         <fastjson-version>1.2.60</fastjson-version>
+        <aliyun-oss-version>3.5.0</aliyun-oss-version>
     </properties>
 
     <modules>
         <module>mall-common</module>
+        <module>mall-gateway</module>
+        <module>mall-auth</module>
         <module>mall-admin</module>
+        <module>mall-product</module>
+        <module>mall-order</module>
+        <module>mall-member</module>
+        <module>mall-thirdpart</module>
+        <module>mall-cart</module>
     </modules>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>2021.0.8</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>2021.0.6.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bootstrap</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
