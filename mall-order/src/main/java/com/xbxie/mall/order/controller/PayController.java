@@ -2,6 +2,8 @@ package com.xbxie.mall.order.controller;
 
 import com.xbxie.mall.common.utils.R;
 import com.xbxie.mall.order.service.PayService;
+import com.xbxie.mall.order.vo.PrePayReqVo;
+import com.xbxie.mall.order.vo.PrePayResVo;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 
@@ -17,5 +19,10 @@ public class PayController {
     @PostMapping("/status/{sn}")
     public R<Integer> wxPayStatus(@PathVariable("sn") String sn) {
         return payService.wxPayStatus(sn);
+    }
+
+    @PostMapping("/codeUrl")
+    public R<String> getCodeUrl(@RequestBody PrePayReqVo prePayReqVo) {
+        return payService.getCodeUrl(prePayReqVo);
     }
 }

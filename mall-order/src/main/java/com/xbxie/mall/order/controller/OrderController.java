@@ -20,12 +20,12 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping("/confirmInfo")
-    public R<ConfirmOrderResVo> getConfirmInfo(@Validated @RequestBody ConfirmOrderReqVo confirmOrderReqVo) {
-        return orderService.getConfirmInfo(confirmOrderReqVo);
+    public R<ConfirmOrderResVo> getConfirmInfo(@Validated @RequestBody ConfirmOrderReqVo confirmOrderReqVo, HttpServletRequest request) {
+        return orderService.getConfirmInfo(confirmOrderReqVo, request);
     }
 
     @PostMapping("/create")
-    public R<CreateOrderResVo> createOrder(@Validated @RequestBody CreateOrderReqVo createOrderReqVo, HttpServletRequest request) {
+    public R<String> createOrder(@Validated @RequestBody CreateOrderReqVo createOrderReqVo, HttpServletRequest request) {
         return orderService.createOrder(createOrderReqVo, request);
     }
 

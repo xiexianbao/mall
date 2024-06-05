@@ -1,7 +1,6 @@
 package com.xbxie.mall.common.utils;
 
 import lombok.Data;
-
 import java.io.Serializable;
 
 
@@ -28,6 +27,14 @@ public class R<D> implements Serializable {
     }
 
     public static <T> R<T> success(T data) {
+        R<T> r = new R<>();
+        r.setCode(0);
+        r.setMsg("success");
+        r.setData(data);
+        return r;
+    }
+
+    public static <T> R<T> successData(T data) {
         R<T> r = new R<>();
         r.setCode(0);
         r.setMsg("success");

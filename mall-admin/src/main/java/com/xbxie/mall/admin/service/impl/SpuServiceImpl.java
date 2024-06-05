@@ -1,5 +1,7 @@
 package com.xbxie.mall.admin.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xbxie.mall.admin.service.SpuService;
@@ -21,10 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -198,9 +197,16 @@ public class SpuServiceImpl implements SpuService {
         return R.success(pageData);
     }
 
-    @Transactional()
+    @Transactional
     @Override
     public R<Void> updateSpu(SpuUpdateVo spuUpdateVo) {
+        List<SpuUpdateVo.Sku> skus = spuUpdateVo.getSkus();
+
+        // skus为空
+        if (CollectionUtils.isEmpty(skus)) {
+            return R.fail("属性商品为空");
+        }
+
         // spu
         CommonSpuEntity spuEntity = commonSpuService.getById(spuUpdateVo.getId());
         if (spuEntity == null) {
@@ -217,14 +223,14 @@ public class SpuServiceImpl implements SpuService {
         }
 
         // attr
-        // 先删除、后添加
+        // 先删除
         QueryWrapper<CommonSpuAttrEntity> attrQueryWrapper = new QueryWrapper<CommonSpuAttrEntity>().eq("spu_id", spuUpdateVo.getId());
         if (commonSpuAttrService.exists(attrQueryWrapper)) {
             if (!commonSpuAttrService.remove(attrQueryWrapper)) {
                 return R.fail("更新商品失败");
             }
         }
-
+        // 后添加
         List<SpuUpdateVo.Attr> attrs = spuUpdateVo.getAttrs();
         if (!CollectionUtils.isEmpty(attrs)) {
             for (SpuUpdateVo.Attr attr : attrs) {
@@ -260,15 +266,13 @@ public class SpuServiceImpl implements SpuService {
             }
         }
 
-        // sku 先删除、后添加
-        QueryWrapper<CommonSkuEntity> skuQueryWrapper = new QueryWrapper<CommonSkuEntity>().eq("spu_id", spuUpdateVo.getId());
-        if (commonSkuService.exists(skuQueryWrapper)) {
-            if (!commonSkuService.remove(skuQueryWrapper)) {
-                return R.fail("更新商品失败");
-            }
-        }
-        List<SpuUpdateVo.Sku> skus = spuUpdateVo.getSkus();
-        if (!CollectionUtils.isEmpty(skus)) {
+
+        // sku
+        QueryWrapper<CommonSkuEntity> skuQuery = new QueryWrapper<CommonSkuEntity>().eq("spu_id", spuUpdateVo.getId());
+
+        // 属性商品为空，直接添加
+        List<CommonSkuEntity> commonSkuEntities = commonSkuService.list(skuQuery);
+        if (CollectionUtils.isEmpty(commonSkuEntities)) {
             List<CommonSkuEntity> skuEntities = skus.stream().map(sku -> {
                 CommonSkuEntity skuEntity = new CommonSkuEntity();
 
@@ -279,12 +283,55 @@ public class SpuServiceImpl implements SpuService {
                 return skuEntity;
             }).collect(Collectors.toList());
 
-            if (!commonSkuService.saveBatch(skuEntities)) {
+            return commonSkuService.saveBatch(skuEntities) ? R.success("更新商品成功") : R.fail("更新商品失败");
+        }
+
+        // 属性种类不一致，则先删除再添加sku
+        Set<String> voKeys = JSON.parseObject(skus.get(0).getAttrs(), new TypeReference<Map<String, String>>() {}).keySet();
+        Set<String> entityKeys = JSON.parseObject(commonSkuEntities.get(0).getAttrs(), new TypeReference<Map<String, String>>() {}).keySet();
+        if (!voKeys.stream().sorted().collect(Collectors.joining()).equals(entityKeys.stream().sorted().collect(Collectors.joining()))) {
+            // 先删除
+            if (!commonSkuService.remove(skuQuery)) {
                 return R.fail("更新商品失败");
+            }
+
+            // 后添加
+            List<CommonSkuEntity> skuEntities = skus.stream().map(sku -> {
+                CommonSkuEntity skuEntity = new CommonSkuEntity();
+
+                BeanUtils.copyProperties(sku, skuEntity);
+                skuEntity.setSpuId(spuEntity.getId());
+                skuEntity.setShopId(spuUpdateVo.getShopId());
+
+                return skuEntity;
+            }).collect(Collectors.toList());
+
+            return commonSkuService.saveBatch(skuEntities) ? R.success("更新商品成功") : R.fail("更新商品失败");
+        }
+
+        // 属性种类一致：更新
+        for (CommonSkuEntity commonSkuEntity : commonSkuEntities) {
+            for (SpuUpdateVo.Sku sku : skus) {
+                boolean valSame = true;
+
+                Map<String, String> entityMap = JSON.parseObject(commonSkuEntity.getAttrs(), new TypeReference<Map<String, String>>() {});
+                Map<String, String> voMap = JSON.parseObject(sku.getAttrs(), new TypeReference<Map<String, String>>() {});
+
+                for (String key : voKeys) {
+                    if (!Objects.equals(entityMap.get(key), voMap.get(key))) {
+                        valSame = false;
+                        break;
+                    }
+                }
+
+                if (valSame) {
+                    commonSkuEntity.setAttrs(JSON.toJSONString(voMap));
+                    break;
+                }
             }
         }
 
-        return R.success("更新商品成功");
+        return commonSkuService.updateBatchById(commonSkuEntities) ? R.success("更新商品成功") : R.fail("更新商品失败");
     }
 
     @Override

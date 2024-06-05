@@ -1,11 +1,11 @@
 package com.xbxie.mall.admin.controller.auth;
 
 import com.alibaba.fastjson.TypeReference;
-import com.xbxie.mall.admin.entityback.UserEntity;
-import com.xbxie.mall.admin.service.UserService;
 import com.xbxie.mall.admin.utils.TestUtils;
 import com.xbxie.mall.admin.vo.LoginReqVo;
 import com.xbxie.mall.admin.vo.LoginResVo;
+import com.xbxie.mall.common.entity.CommonUserEntity;
+import com.xbxie.mall.common.service.CommonUserService;
 import com.xbxie.mall.common.utils.R;
 import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.Assertions;
@@ -31,7 +31,7 @@ public class LoginTest {
     private TestUtils testUtils;
 
     @Resource
-    private UserService userService;
+    private CommonUserService commonUserService;
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -52,11 +52,11 @@ public class LoginTest {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
         // 新增测试数据（添加一个用户）
-        UserEntity userEntity = new UserEntity();
+        CommonUserEntity userEntity = new CommonUserEntity();
         userEntity.setName(name);
         userEntity.setAccount(account);
         userEntity.setPassword(encoder.encode(password));
-        userService.save(userEntity);
+        commonUserService.save(userEntity);
 
         // 验证 token 的生成
         LoginReqVo loginReqVo = new LoginReqVo();

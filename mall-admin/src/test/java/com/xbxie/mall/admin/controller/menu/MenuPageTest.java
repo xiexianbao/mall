@@ -1,17 +1,16 @@
 package com.xbxie.mall.admin.controller.menu;
 
 import com.alibaba.fastjson.TypeReference;
-import com.xbxie.mall.admin.entityback.MenuEntity;
-import com.xbxie.mall.admin.entityback.UserEntity;
-import com.xbxie.mall.admin.service.MenuService;
 import com.xbxie.mall.admin.utils.TestUtils;
 import com.xbxie.mall.admin.vo.MenuPageVo;
+import com.xbxie.mall.common.entity.CommonMenuEntity;
+import com.xbxie.mall.common.entity.CommonUserEntity;
+import com.xbxie.mall.common.service.CommonMenuService;
 import com.xbxie.mall.common.utils.PageData;
 import com.xbxie.mall.common.utils.R;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -32,19 +31,19 @@ public class MenuPageTest {
     private TestUtils testUtils;
 
     @Resource
-    private MenuService menuService;
+    private CommonMenuService commonMenuService;
 
     private List<Long> menuIds = new ArrayList<>();
 
-    private List<MenuEntity> menuEntities = new ArrayList<>();
-
+    private List<CommonMenuEntity> menuEntities = new ArrayList<>();
+    
     @BeforeEach
     public void beforeEach() {
         // 初始化测试数据
 
         // 添加菜单
         for (int i = 1; i <= 30; i++) {
-            MenuEntity menuEntity = new MenuEntity();
+            CommonMenuEntity menuEntity = new CommonMenuEntity();
 
             menuEntity.setId(null);
             menuEntity.setName(namePrefix + i);
@@ -53,7 +52,7 @@ public class MenuPageTest {
             menuEntity.setCreateTime(null);
             menuEntity.setUpdateTime(null);
 
-            menuService.save(menuEntity);
+            commonMenuService.save(menuEntity);
             menuEntities.add(menuEntity);
             menuIds.add(menuEntity.getId());
         }
@@ -72,7 +71,7 @@ public class MenuPageTest {
         menuPageVo.setName(namePrefix + "1"); // 12
         menuPageVo.setPageNum(1L);
         menuPageVo.setPageSize(10L);
-        R<PageData<MenuEntity>> resData = testUtils.getResData(url, menuPageVo, new TypeReference<R<PageData<MenuEntity>>>() {});
+        R<PageData<CommonMenuEntity>> resData = testUtils.getResData(url, menuPageVo, new TypeReference<R<PageData<CommonMenuEntity>>>() {});
 
         Assertions.assertEquals(0, resData.getCode());
         Assertions.assertEquals("success", resData.getMsg());
@@ -81,7 +80,7 @@ public class MenuPageTest {
         Assertions.assertEquals(10, resData.getData().getList().size());
         Assertions.assertEquals(menuEntities.stream().filter(menuEntity -> Pattern.compile(".*" + namePrefix + "1.*").matcher(menuEntity.getName()).matches()).count(), resData.getData().getTotal());
 
-        for (MenuEntity menuEntity : resData.getData().getList()) {
+        for (CommonMenuEntity menuEntity : resData.getData().getList()) {
             Assertions.assertTrue(
                 Pattern.compile(".*" + namePrefix + "1.*").matcher(menuEntity.getName()).matches()
             );
@@ -97,8 +96,7 @@ public class MenuPageTest {
         menuPageVo.setPageNum(1000000000L);
         menuPageVo.setPageSize(1000000000L);
 
-
-        R<PageData<UserEntity>> pageDataR = testUtils.getResData(url, menuPageVo, new TypeReference<R<PageData<UserEntity>>>(){});
+        R<PageData<CommonUserEntity>> pageDataR = testUtils.getResData(url, menuPageVo, new TypeReference<R<PageData<CommonUserEntity>>>(){});
         Assertions.assertEquals(1, pageDataR.getData().getTotal());
         Assertions.assertEquals(0, pageDataR.getData().getList().size());
     }

@@ -39,7 +39,7 @@ public class CommonCartEntity implements Serializable {
 	private Integer quantity;
 
 	/**
-	 * 是否选中
+	 * 是否选中 0：未选中，1：已选中
 	 */
 	private Integer selected;
 

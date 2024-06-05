@@ -5,13 +5,15 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.xbxie.mall.common.bo.TokenBo;
 import com.xbxie.mall.common.entity.*;
 import com.xbxie.mall.common.service.*;
+import com.xbxie.mall.common.service.impl.CommonCartServiceImpl;
 import com.xbxie.mall.common.utils.*;
 import com.xbxie.mall.order.service.OrderService;
 import com.xbxie.mall.order.utils.WxPayUtils;
 import com.xbxie.mall.order.vo.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
  */
 @Service("orderService")
 public class OrderServiceImpl implements OrderService {
+
     @Resource
     private CommonSkuService commonSkuService;
 
@@ -37,7 +40,7 @@ public class OrderServiceImpl implements OrderService {
     private CommonOrderService commonOrderService;
 
     @Resource
-    private CommonOrderItemService commonOrderItemService;
+    private CommonOrderGoodsService commonOrderGoodsService;
 
     @Resource
     private CommonShopService commonShopService;
@@ -45,238 +48,326 @@ public class OrderServiceImpl implements OrderService {
     @Resource
     private WxPayUtils wxPayUtils;
 
-    @Override
-    public R<ConfirmOrderResVo> getConfirmInfo(ConfirmOrderReqVo confirmOrderReqVo) {
-        ConfirmOrderResVo confirmOrderResVo;
+    @Resource
+    private CommonCartService commonCartService;
 
-        if ("cart".equals(confirmOrderReqVo.getSource())) {
+    @Override
+    public R<ConfirmOrderResVo> getConfirmInfo(ConfirmOrderReqVo confirmOrderReqVo, HttpServletRequest request) {
+        TokenBo tokenBo = JwtUtils.parseToken(request);
+        if (confirmOrderReqVo.getByCart()) {
             // 根据购物车数据生成订单数据
-            confirmOrderResVo = genOrderInfoByCart();
+            return confirmOrderByCart(tokenBo.getId());
         } else {
             // 根据商品信息生成订单数据
-            confirmOrderResVo = genOrderInfoByGoods(confirmOrderReqVo);
+            return confirmOrderByGoods(confirmOrderReqVo);
         }
-
-        return R.success(confirmOrderResVo);
     }
 
     @Override
-    public R<CreateOrderResVo> createOrder(CreateOrderReqVo createOrderReqVo, HttpServletRequest request) {
-        Long skuId = createOrderReqVo.getId();
-        Integer skuNum = createOrderReqVo.getNum();
-        CreateOrderResVo createOrderResVo = new CreateOrderResVo();
-
-        CommonSkuEntity commonSkuEntity = commonSkuService.getById(skuId);
-        // sku 不存在
-        if (commonSkuEntity == null) {
-            throw new CustomException("商品不存在");
-        }
-
-        // sku 库存不够
-        if (commonSkuEntity.getStock() < skuNum) {
-            throw new CustomException("商品库存不足");
-        }
-
-
-        TokenBo tokenBo = JwtUtils.parseToken(request);
-        if (tokenBo == null) {
-            throw new CustomException("用户信息异常");
-        }
-
-        // 订单入库
+    public R<String> createOrder(CreateOrderReqVo createOrderReqVo, HttpServletRequest request) {
+        // 一个店铺对应一个母订单
+        // 一个母订单对应多个商品
+        Long addressId = createOrderReqVo.getAddressId();
+        List<CreateOrderReqVo.Shop> shopList = createOrderReqVo.getShopList();
         SnowflakeDistributeId idWorker = new SnowflakeDistributeId(0, 0);
-        String orderSn = String.valueOf(idWorker.nextId());
-        String orderItemSn = String.valueOf(idWorker.nextId());
-
-        BigDecimal amount = BigDecimal.valueOf(skuNum).multiply(commonSkuEntity.getPrice()).setScale(2, RoundingMode.DOWN);
-        CommonOrderEntity commonOrderEntity = new CommonOrderEntity();
-        commonOrderEntity.setAmount(amount);
-        commonOrderEntity.setSn(orderSn);
-        commonOrderEntity.setUserId(tokenBo.getId());
-        commonOrderService.save(commonOrderEntity);
-
-        CommonOrderItemEntity commonOrderItemEntity = new CommonOrderItemEntity();
-        commonOrderItemEntity.setPid(commonOrderEntity.getId());
-        commonOrderItemEntity.setSkuId(createOrderReqVo.getId());
-        commonOrderItemEntity.setSkuNum(createOrderReqVo.getNum());
-        commonOrderItemEntity.setSn(orderItemSn);
-        commonOrderItemEntity.setAmount(amount);
-        commonOrderItemEntity.setUserId(tokenBo.getId());
-        commonOrderItemService.save(commonOrderItemEntity);
+        String batchNo = String.valueOf(idWorker.nextId());
+        TokenBo tokenBo = JwtUtils.parseToken(request);
 
 
-        // 微信支付
-        int total = amount.multiply(BigDecimal.valueOf(100)).intValue();
-        String name = "";
+        for (CreateOrderReqVo.Shop shop : shopList) {
+            // 订单
+            CommonOrderEntity commonOrderEntity = new CommonOrderEntity();
+            String wxNo = String.valueOf(idWorker.nextId());
+            BigDecimal shopAmount = BigDecimal.ZERO;
 
-        Long spuId = commonSkuEntity.getSpuId();
-        if (spuId != null) {
-            CommonSpuEntity commonSpuEntity = commonSpuService.getById(spuId);
-            if (commonSpuEntity != null) {
-                name = commonSpuEntity.getName();
+
+            // 商品
+            List<CreateOrderReqVo.Goods> goodsList = shop.getGoodsList();
+            List<CommonOrderGoodsEntity> commonOrderGoodsEntities = new ArrayList<>();
+
+            for (CreateOrderReqVo.Goods goods : goodsList) {
+                CommonOrderGoodsEntity commonOrderGoodsEntity = new CommonOrderGoodsEntity();
+                commonOrderGoodsEntity.setOrderId(commonOrderEntity.getId());
+                commonOrderGoodsEntity.setUserId(tokenBo.getId());
+                commonOrderGoodsEntity.setSkuId(goods.getSkuId());
+                commonOrderGoodsEntity.setSkuNum(goods.getSkuNum());
+                CommonSkuEntity commonSkuEntity = commonSkuService.getById(goods.getSkuId());
+                commonOrderGoodsEntity.setAmount(commonSkuEntity.getPrice().multiply(BigDecimal.valueOf(goods.getSkuNum())).setScale(2, RoundingMode.HALF_UP));
+                shopAmount = shopAmount.add(commonOrderGoodsEntity.getAmount());
+                commonOrderGoodsEntities.add(commonOrderGoodsEntity);
+            }
+
+            commonOrderEntity.setUserId(tokenBo.getId());
+            commonOrderEntity.setShopId(shop.getId());
+            commonOrderEntity.setAddressId(addressId);
+            commonOrderEntity.setBatchNo(batchNo);
+            commonOrderEntity.setWxNo(wxNo);
+            commonOrderEntity.setAmount(shopAmount.setScale(2, RoundingMode.HALF_UP));
+
+            if (!commonOrderService.save(commonOrderEntity)) {
+                throw new CustomException("创建订单失败");
+            }
+
+            for (CommonOrderGoodsEntity commonOrderGoodsEntity : commonOrderGoodsEntities) {
+                commonOrderGoodsEntity.setOrderId(commonOrderEntity.getId());
+            }
+
+            if (!commonOrderGoodsService.saveBatch(commonOrderGoodsEntities)) {
+                throw new CustomException("创建订单失败");
             }
         }
 
-        String codeUrl = wxPayUtils.createNativeOrder(total, orderSn, name);
-
-        if (!StringUtils.hasLength(codeUrl)) {
-            throw new CustomException("下单失败");
-        }
-
-        createOrderResVo.setCodeUrl(codeUrl);
-        createOrderResVo.setSn(orderSn);
-        return R.success(createOrderResVo);
+        return R.successData(batchNo);
     }
 
     @Override
     public R<List<OrderListItemResVo>> list(OrderListReqVo orderListReqVo, HttpServletRequest request) {
-        List<OrderListItemResVo> empty = new ArrayList<>();
         String goodsName = orderListReqVo.getGoodsName();
         Integer status = orderListReqVo.getStatus();
         TokenBo tokenBo = JwtUtils.parseToken(request);
         Long userId = tokenBo.getId();
 
-        // 查询用户的子订单
-        QueryWrapper<CommonOrderItemEntity> orderItemQuery = new QueryWrapper<CommonOrderItemEntity>().eq("user_id", userId);
-        if (status != null) {
-            orderItemQuery.eq("status", status);
-        }
-        List<CommonOrderItemEntity> commonOrderItemEntities = commonOrderItemService.list(orderItemQuery);
+        // QueryWrapper<CommonOrderEntity> orderQuery = new QueryWrapper<CommonOrderEntity>().eq("user_id", userId);
+        // Page<CommonUserEntity> res = commonOrderService.page(new Page<>(orderListReqVo.getPageNum(), orderListReqVo.getPageSize()), orderQuery);
 
-        if (CollectionUtils.isEmpty(commonOrderItemEntities)) {
-            return R.success(empty);
-        }
+        // 父订单
+        List<CommonOrderEntity> commonOrderEntities = commonOrderService.list(new QueryWrapper<CommonOrderEntity>().eq("user_id", userId));
 
-        // 查询子订单的商品
-        List<Long> skuIds = commonOrderItemEntities.stream().map(CommonOrderItemEntity::getSkuId).collect(Collectors.toList());
-        QueryWrapper<CommonSkuEntity> skuQuery = new QueryWrapper<CommonSkuEntity>().in("id", skuIds);
-        if(StringUtils.hasLength(goodsName)) {
-            skuQuery.like("name", goodsName);
-        }
-        List<CommonSkuEntity> commonSkuEntities = commonSkuService.list(skuQuery);
+        // 子订单
+        List<Long> orderIds = commonOrderEntities.stream().map(CommonOrderEntity::getId).collect(Collectors.toList());
+        List<CommonOrderGoodsEntity> commonOrderItemEntities = commonOrderGoodsService.list(new QueryWrapper<CommonOrderGoodsEntity>().in("pid", orderIds));
 
-        if (CollectionUtils.isEmpty(commonSkuEntities)) {
-            return R.success(empty);
-        }
+        // 商品
+        List<Long> skuIds = commonOrderItemEntities.stream().map(CommonOrderGoodsEntity::getSkuId).collect(Collectors.toList());
+        List<CommonSkuEntity> commonSkuEntities = commonSkuService.listByIds(skuIds);
 
-        // 查询商品的店铺信息
+        // 店铺
         List<Long> shopIds = commonSkuEntities.stream().map(CommonSkuEntity::getShopId).collect(Collectors.toList());
         List<CommonShopEntity> commonShopEntities = commonShopService.listByIds(shopIds);
 
-        if (CollectionUtils.isEmpty(commonShopEntities)) {
-            return R.success(empty);
+
+        List<OrderListItemResVo> orderListItemResVos = new ArrayList<>();
+
+        for (CommonOrderEntity commonOrderEntity : commonOrderEntities) {
+            OrderListItemResVo orderListItemResVo = new OrderListItemResVo();
+
+            orderListItemResVo.setId(commonOrderEntity.getId());
+            List<OrderListItemResVo.ShopItem> shopList = new ArrayList<>();
+
+            // 设置 shopList
+            for (CommonShopEntity commonShopEntity : commonShopEntities) {
+                OrderListItemResVo.ShopItem shopItem = new OrderListItemResVo.ShopItem();
+                BigDecimal shopPrice = BigDecimal.ZERO;
+                List<OrderListItemResVo.Goods> goodsList = new ArrayList<>();
+
+                shopItem.setName(commonShopEntity.getName());
+
+                for (CommonSkuEntity commonSkuEntity : commonSkuEntities) {
+                    for (CommonOrderGoodsEntity commonOrderGoodsEntity : commonOrderItemEntities) {
+                        if (Objects.equals(commonShopEntity.getId(), commonSkuEntity.getShopId()) && Objects.equals(commonSkuEntity.getId(), commonOrderGoodsEntity.getSkuId())) {
+                            CommonSpuEntity commonSpuEntity = commonSpuService.getById(commonSkuEntity.getSpuId());
+                            OrderListItemResVo.Goods goods = new OrderListItemResVo.Goods();
+
+                            goods.setId(commonOrderGoodsEntity.getId());
+                            goods.setName(commonSpuEntity.getName());
+                            goods.setAttrs(GoodsUtils.getAttrValues(commonSkuEntity.getAttrs()));
+                            goods.setImg(commonSkuEntity.getImg());
+                            goods.setNum(commonOrderGoodsEntity.getSkuNum());
+                            goods.setPrice(commonSkuEntity.getPrice());
+
+                            shopPrice = shopPrice.add(commonOrderGoodsEntity.getAmount());
+
+                            goodsList.add(goods);
+                        }
+                    }
+                }
+
+                shopItem.setPrice(shopPrice);
+                shopItem.setGoodsList(goodsList);
+            }
+
+
+            orderListItemResVo.setShopList(shopList);
+            orderListItemResVos.add(orderListItemResVo);
         }
 
-        // 三层循环
-        // 第一层：店铺
-        // 第二层：商品
-        // 第三层：子订单
-        List<OrderListItemResVo> orderListItemResVos = new ArrayList<>();
-        for (CommonShopEntity commonShopEntity : commonShopEntities) {
-            OrderListItemResVo orderListItemResVo = new OrderListItemResVo();
-            List<OrderListItemResVo.OrderItem> orderItems = new ArrayList<>();
+        return R.success(orderListItemResVos);
+    }
 
-            orderListItemResVo.setShopName(commonShopEntity.getName());
-            orderListItemResVo.setOrderItems(orderItems);
+    private R<ConfirmOrderResVo> confirmOrderByCart(Long userId) {
+        List<CommonCartEntity> commonCartEntities = commonCartService.list(new QueryWrapper<CommonCartEntity>().eq("user_id", userId).eq("selected", 1));
+        if (CollectionUtils.isEmpty(commonCartEntities)) {
+            throw new CustomException("购物车无选中商品");
+        }
+
+        // 商品
+        List<Long> skuIds = commonCartEntities.stream().map(CommonCartEntity::getSkuId).collect(Collectors.toList());
+        List<CommonSkuEntity> commonSkuEntities = commonSkuService.listByIds(skuIds);
+
+        // 店铺
+        List<Long> shopIds = commonSkuEntities.stream().map(CommonSkuEntity::getShopId).collect(Collectors.toList());
+        List<CommonShopEntity> commonShopEntities = commonShopService.listByIds(shopIds);
+
+        ConfirmOrderResVo confirmOrderResVo = new ConfirmOrderResVo();
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        List<ConfirmOrderResVo.ShopItem> shopList = new ArrayList<>();
+
+        for (CommonShopEntity commonShopEntity : commonShopEntities) {
+            ConfirmOrderResVo.ShopItem shopItem = new ConfirmOrderResVo.ShopItem();
+            List<ConfirmOrderResVo.Goods> goodsList = new ArrayList<>();
+
+            shopItem.setName(commonShopEntity.getName());
+            shopItem.setId(commonShopEntity.getId());
+            shopItem.setGoodsList(goodsList);
 
             for (CommonSkuEntity commonSkuEntity : commonSkuEntities) {
-                // 过滤商品
-                if (Objects.equals(commonSkuEntity.getShopId(), commonShopEntity.getId())) {
-                    for (CommonOrderItemEntity commonOrderItemEntity : commonOrderItemEntities) {
-                        // 过滤订单
-                        if (Objects.equals(commonOrderItemEntity.getSkuId(), commonSkuEntity.getId())) {
-                            OrderListItemResVo.OrderItem orderItem = new OrderListItemResVo.OrderItem();
 
+                if (Objects.equals(commonShopEntity.getId(), commonSkuEntity.getShopId())) {
+
+                    for (CommonCartEntity commonCartEntity : commonCartEntities) {
+
+                        if (Objects.equals(commonSkuEntity.getId(), commonCartEntity.getSkuId())) {
                             CommonSpuEntity commonSpuEntity = commonSpuService.getById(commonSkuEntity.getSpuId());
-                            if (commonSpuEntity != null) {
-                                orderItem.setName(commonSpuEntity.getName());
-                                orderItem.setImg(commonSpuEntity.getFirstImg());
+
+                            // 库存不足
+                            if (commonSkuEntity.getStock() < commonCartEntity.getQuantity()) {
+                                System.out.println("库存不足");
+                                throw new CustomException(commonSpuEntity.getName() + "库存不足");
                             }
 
-                            Map<String, String> attrsMap = (Map<String, String>)JSON.parse(commonSkuEntity.getAttrs());
+                            ConfirmOrderResVo.Goods goods = new ConfirmOrderResVo.Goods();
+                            goods.setSkuId(commonSkuEntity.getId());
+
+                            Map<String, String> attrsMap = (Map<String, String>) JSON.parse(commonSkuEntity.getAttrs());
                             if(attrsMap == null) {
-                                orderItem.setAttrs("");
+                                goods.setAttrs("");
                             } else {
                                 String str = String.join(",", attrsMap.values());
-                                orderItem.setAttrs(str);
+                                goods.setAttrs(str);
                             }
 
-                            orderItem.setNum(commonOrderItemEntity.getSkuNum());
-                            orderItem.setPrice(commonOrderItemEntity.getAmount());
 
-                            orderItems.add(orderItem);
-                            // 商品对应的订单
+                            if (commonSpuEntity != null) {
+                                goods.setSpuId(commonSpuEntity.getId());
+                                goods.setImg(commonSpuEntity.getFirstImg());
+                                goods.setName(commonSpuEntity.getName());
+                            }
+
+                            goods.setNum(commonCartEntity.getQuantity());
+                            goods.setPrice(BigDecimal.valueOf(commonCartEntity.getQuantity()).multiply(commonSkuEntity.getPrice()).setScale(2, RoundingMode.DOWN));
+
+                            totalPrice = totalPrice.add(goods.getPrice());
+
+                            goodsList.add(goods);
                             break;
                         }
                     }
                 }
             }
 
-            orderListItemResVos.add(orderListItemResVo);
+
+            shopList.add(shopItem);
         }
 
-        // 分页
 
-        return R.success(orderListItemResVos);
+        confirmOrderResVo.setTotalPrice(totalPrice.setScale(2, RoundingMode.DOWN));
+        confirmOrderResVo.setShopList(shopList);
+        return R.success(confirmOrderResVo);
     }
 
-    private ConfirmOrderResVo genOrderInfoByCart() {
-        return null;
-    }
-
-    private ConfirmOrderResVo genOrderInfoByGoods(ConfirmOrderReqVo confirmOrderReqVo) {
+    private R<ConfirmOrderResVo> confirmOrderByGoods(ConfirmOrderReqVo confirmOrderReqVo) {
         Long skuId = confirmOrderReqVo.getId();
         Integer skuNum = confirmOrderReqVo.getNum();
-        ConfirmOrderResVo confirmOrderResVo = new ConfirmOrderResVo();
-
+        if (skuId == null) {
+            throw new CustomException("请输入商品id");
+        }
+        if (skuNum == null) {
+            throw new CustomException("请输入商品商品数量");
+        }
+        if (skuNum < 1) {
+            throw new CustomException("商品数量至少为1");
+        }
         // sku 不存在
         CommonSkuEntity commonSkuEntity = commonSkuService.getById(skuId);
         if (commonSkuEntity == null) {
             throw new CustomException("商品不存在");
         }
-
         // sku 库存不足
         if (commonSkuEntity.getStock() < skuNum) {
             throw new CustomException("商品库存不足");
         }
-
         // spu 不存在
-        Long spuId = commonSkuEntity.getSpuId();
-        if (spuId == null) {
-            throw new CustomException("商品不存在");
-        }
-        CommonSpuEntity commonSpuEntity = commonSpuService.getById(spuId);
+        CommonSpuEntity commonSpuEntity = commonSpuService.getById(commonSkuEntity.getSpuId());
         if (commonSpuEntity == null) {
             throw new CustomException("商品不存在");
         }
+        // 商品未上架
+        if (commonSpuEntity.getStatus() != 1) {
+            throw new CustomException("商品未上架");
+        }
 
-        // 设置商品名
-        confirmOrderResVo.setName(commonSpuEntity.getName());
+        ConfirmOrderResVo confirmOrderResVo = new ConfirmOrderResVo();
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        List<ConfirmOrderResVo.ShopItem> shopList = new ArrayList<>();
 
-        // 店铺信息
-        Long shopId = commonSpuEntity.getShopId();
-        if (shopId != null) {
-            CommonShopEntity commonShopEntity = commonShopService.getById(shopId);
-            if (commonShopEntity != null) {
-                confirmOrderResVo.setShopName(commonShopEntity.getName());
+        // 设置shopList
+        {
+            ConfirmOrderResVo.ShopItem shopItem = new ConfirmOrderResVo.ShopItem();
+
+            // 设置shopItem
+            {
+                // 设置店铺基本信息
+                {
+                    Long shopId = commonSpuEntity.getShopId();
+                    if (shopId != null) {
+                        CommonShopEntity commonShopEntity = commonShopService.getById(shopId);
+                        if (commonShopEntity != null) {
+                            shopItem.setId(commonShopEntity.getId());
+                            shopItem.setName(commonShopEntity.getName());
+                        }
+                    }
+                }
+
+
+
+                // 设置店铺goodsList
+                {
+                    List<ConfirmOrderResVo.Goods> goodsList = new ArrayList<>();
+                    ConfirmOrderResVo.Goods goods = new ConfirmOrderResVo.Goods();
+
+                    // 设置店铺goods
+                    {
+
+                        goods.setSpuId(commonSpuEntity.getId());
+                        goods.setSkuId(commonSkuEntity.getId());
+                        goods.setName(commonSpuEntity.getName());
+                        goods.setNum(skuNum);
+                        goods.setPrice(commonSkuEntity.getPrice().multiply(BigDecimal.valueOf(skuNum)).setScale(2, RoundingMode.HALF_UP));
+
+                        Map<String, String> attrsMap = (Map<String, String>)JSON.parse(commonSkuEntity.getAttrs());
+                        if(attrsMap == null) {
+                            goods.setAttrs("");
+                        } else {
+                            String str = String.join(",", attrsMap.values());
+                            goods.setAttrs(str);
+                        }
+
+                        goods.setImg(commonSpuEntity.getFirstImg());
+                        totalPrice = totalPrice.add(goods.getPrice());
+                    }
+
+                    goodsList.add(goods);
+                    shopItem.setGoodsList(goodsList);
+                }
             }
+
+            shopList.add(shopItem);
         }
 
 
-        // 设置 sku 信息
-        confirmOrderResVo.setNum(skuNum);
-        confirmOrderResVo.setPrice(commonSkuEntity.getPrice().multiply(BigDecimal.valueOf(skuNum)).setScale(2, RoundingMode.HALF_UP));
+        confirmOrderResVo.setTotalPrice(totalPrice.setScale(2, RoundingMode.DOWN));
+        confirmOrderResVo.setShopList(shopList);
 
-        Map<String, String> attrsMap = (Map<String, String>)JSON.parse(commonSkuEntity.getAttrs());
-        if(attrsMap == null) {
-            confirmOrderResVo.setAttrs("");
-        } else {
-            String str = String.join(",", attrsMap.values());
-            confirmOrderResVo.setAttrs(str);
-        }
-
-        confirmOrderResVo.setImg(StringUtils.hasLength(commonSkuEntity.getImg()) ? commonSkuEntity.getImg() : commonSpuEntity.getFirstImg());
-
-        return confirmOrderResVo;
+        return R.success(confirmOrderResVo);
     }
 }

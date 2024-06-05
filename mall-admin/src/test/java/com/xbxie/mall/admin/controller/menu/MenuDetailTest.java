@@ -2,15 +2,13 @@ package com.xbxie.mall.admin.controller.menu;
 
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.xbxie.mall.admin.entityback.MenuEntity;
-import com.xbxie.mall.admin.entityback.UserEntity;
-import com.xbxie.mall.admin.service.MenuService;
-import com.xbxie.mall.admin.service.RoleService;
 import com.xbxie.mall.admin.service.UserService;
 import com.xbxie.mall.admin.utils.TestUtils;
-import com.xbxie.mall.admin.vo.LoginReqVo;
-import com.xbxie.mall.admin.vo.LoginResVo;
 import com.xbxie.mall.admin.vo.UserAddVo;
+import com.xbxie.mall.common.entity.CommonMenuEntity;
+import com.xbxie.mall.common.entity.CommonUserEntity;
+import com.xbxie.mall.common.service.CommonMenuService;
+import com.xbxie.mall.common.service.CommonUserService;
 import com.xbxie.mall.common.utils.R;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -39,13 +37,12 @@ public class MenuDetailTest {
     private UserService userService;
 
     @Resource
-    private RoleService roleService;
+    private CommonUserService commonUserService;
 
     @Resource
-    private MenuService menuService;
+    private CommonMenuService commonMenuService;
 
-    @Resource
-    private AuthService authService;
+    
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -72,21 +69,21 @@ public class MenuDetailTest {
         userAddVo.setRoleIdList(null);
 
         userService.add(userAddVo);
-
-        UserEntity userEntity = userService.getOne(new QueryWrapper<UserEntity>().eq("name", userAddVo.getName()).eq("account", userAddVo.getAccount()));
+        
+        CommonUserEntity userEntity = commonUserService.getOne(new QueryWrapper<CommonUserEntity>().eq("name", userAddVo.getName()).eq("account", userAddVo.getAccount()));
         userIds.add(userEntity.getId());
 
         // 登录获取 token
-        LoginReqVo loginReqVo = new LoginReqVo();
-        loginReqVo.setAccount(userAddVo.getAccount());
-        loginReqVo.setPassword(password);
-        R<LoginResVo> loginResVo = authService.login(loginReqVo);
-        httpHeaders.add("token", loginResVo.getData().getToken());
+        // LoginReqVo loginReqVo = new LoginReqVo();
+        // loginReqVo.setAccount(userAddVo.getAccount());
+        // loginReqVo.setPassword(password);
+        // R<LoginResVo> loginResVo = authService.login(loginReqVo);
+        // httpHeaders.add("token", loginResVo.getData().getToken());
 
         // 添加菜单
-        MenuEntity menuEntity = new MenuEntity();
+        CommonMenuEntity menuEntity = new CommonMenuEntity();
         menuEntity.setName(random.nextLong() + "");
-        menuService.save(menuEntity);
+        commonMenuService.save(menuEntity);
         menuIds.add(menuEntity.getId());
     }
 
@@ -103,7 +100,7 @@ public class MenuDetailTest {
     @DisplayName("获取菜单详情")
     @Test
     void getRole() {
-        R<MenuEntity> resData = testUtils.getResData(url + this.menuIds.get(0), null, httpHeaders, new TypeReference<R<MenuEntity>>() {
+        R<CommonMenuEntity> resData = testUtils.getResData(url + this.menuIds.get(0), null, httpHeaders, new TypeReference<R<CommonMenuEntity>>() {
         });
         Assertions.assertNotNull(resData.getData());
         Assertions.assertNotNull(resData.getData().getId());

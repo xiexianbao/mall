@@ -17,7 +17,6 @@ public class OrderListReqVo {
     /**
      * 订单状态
      */
-    @NotNull(message = "请输入订单状态")
     private Integer status;
 
     /**

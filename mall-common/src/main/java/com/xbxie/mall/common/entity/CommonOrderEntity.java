@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -30,9 +29,24 @@ public class CommonOrderEntity implements Serializable {
 	private Long userId;
 
 	/**
-	 * 订单号
+	 * 店铺id
 	 */
-	private String sn;
+	private Long shopId;
+
+	/**
+	 * 收获地址id
+	 */
+	private Long addressId;
+
+	/**
+	 * 批次号
+	 */
+	private String batchNo;
+
+	/**
+	 * 微信订单号
+	 */
+	private String wxNo;
 
 	/**
 	 * 订单金额

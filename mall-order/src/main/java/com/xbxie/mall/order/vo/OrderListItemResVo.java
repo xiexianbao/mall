@@ -11,12 +11,25 @@ import java.util.List;
 @Data
 public class OrderListItemResVo {
 
-    private String shopName;
+    private Long id;
 
-    private List<OrderItem> orderItems;
+    private List<ShopItem> shopList;
 
     @Data
-    public static class OrderItem {
+    public static class ShopItem {
+
+        private String name;
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING)
+        private BigDecimal price;
+
+        private List<Goods> goodsList;
+    }
+
+    @Data
+    public static class Goods {
+
+        private Long id;
 
         private String name;
 
@@ -29,5 +42,4 @@ public class OrderListItemResVo {
         @JsonFormat(shape = JsonFormat.Shape.STRING)
         private BigDecimal price;
     }
-
 }

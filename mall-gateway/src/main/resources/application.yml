@@ -48,3 +48,10 @@ spring:
             - Path=/thirdpart/**
           filters:
             - RewritePath=/thirdpart/(?<segment>/?.*),/$\{segment}
+
+        - id: cart_route
+          uri: lb://mall-cart
+          predicates:
+            - Path=/cart/**
+          filters:
+            - RewritePath=/cart/(?<segment>/?.*),/$\{segment}

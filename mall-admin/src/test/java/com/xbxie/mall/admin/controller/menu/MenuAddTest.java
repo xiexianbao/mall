@@ -2,10 +2,10 @@ package com.xbxie.mall.admin.controller.menu;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
-import com.xbxie.mall.admin.entityback.MenuEntity;
-import com.xbxie.mall.admin.service.impl.MenuServiceImpl;
 import com.xbxie.mall.admin.utils.TestUtils;
 import com.xbxie.mall.admin.vo.MenuAddVo;
+import com.xbxie.mall.common.entity.CommonMenuEntity;
+import com.xbxie.mall.common.service.impl.CommonMenuServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ public class MenuAddTest {
     private TestUtils testUtils;
 
     @Autowired
-    private MenuServiceImpl menuService;
+    private CommonMenuServiceImpl commonMenuService;
 
     @DisplayName("插入一个菜单")
     @Test
@@ -49,8 +49,8 @@ public class MenuAddTest {
 
         testUtils.assertSuccess(url, menuAddVo, "添加菜单成功");
 
-        QueryWrapper<MenuEntity> wrapper = new QueryWrapper<MenuEntity>().eq("name", name).eq("url", path);
-        MenuEntity menuEntity = menuService.getOne(wrapper);
+        QueryWrapper<CommonMenuEntity> wrapper = new QueryWrapper<CommonMenuEntity>().eq("name", name).eq("url", path);
+        CommonMenuEntity menuEntity = commonMenuService.getOne(wrapper);
         Assertions.assertNotNull(menuEntity);
         Assertions.assertTrue(SqlRunner.db().delete("delete from ums_menu where id = " + menuEntity.getId()));
 
@@ -81,7 +81,7 @@ public class MenuAddTest {
         testUtils.simplePerformAssert(url, menuAddVo1, 0, "添加菜单成功");
         testUtils.simplePerformAssert(url, menuAddVo2, 500, "菜单路径重复");
 
-        MenuEntity menuEntity = menuService.getOne(new QueryWrapper<MenuEntity>().eq("url", path1AndPath2));
+        CommonMenuEntity menuEntity = commonMenuService.getOne(new QueryWrapper<CommonMenuEntity>().eq("url", path1AndPath2));
         Assertions.assertNotNull(menuEntity);
         Assertions.assertTrue(SqlRunner.db().delete("delete from ums_menu where id = " + menuEntity.getId()));
     }
@@ -103,7 +103,7 @@ public class MenuAddTest {
         testUtils.simplePerformAssert(url, menuAddVo1, 0, "添加菜单成功");
         testUtils.simplePerformAssert(url, menuAddVo2, 500, "菜单名重复");
 
-        MenuEntity menuEntity = menuService.getOne(new QueryWrapper<MenuEntity>().eq("name", name1AndName2));
+        CommonMenuEntity menuEntity = commonMenuService.getOne(new QueryWrapper<CommonMenuEntity>().eq("name", name1AndName2));
         Assertions.assertNotNull(menuEntity);
         Assertions.assertTrue(SqlRunner.db().delete("delete from ums_menu where id = " + menuEntity.getId()));
     }

@@ -1,9 +1,9 @@
 package com.xbxie.mall.admin.controller.auth;
 
-import com.xbxie.mall.admin.entityback.UserEntity;
-import com.xbxie.mall.admin.service.UserService;
 import com.xbxie.mall.admin.utils.TestUtils;
 import com.xbxie.mall.admin.vo.LoginReqVo;
+import com.xbxie.mall.common.entity.CommonUserEntity;
+import com.xbxie.mall.common.service.CommonUserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,7 @@ public class LogoutTest {
     private TestUtils testUtils;
 
     @Resource
-    private UserService userService;
+    private CommonUserService commonUserService;
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -48,11 +48,11 @@ public class LogoutTest {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
         // 新增测试数据（添加一个用户）
-        UserEntity userEntity = new UserEntity();
+        CommonUserEntity userEntity = new CommonUserEntity();
         userEntity.setName(name);
         userEntity.setAccount(account);
         userEntity.setPassword(encoder.encode(password));
-        userService.save(userEntity);
+        commonUserService.save(userEntity);
 
 
         // 先进行登录，在 redis 存入 token

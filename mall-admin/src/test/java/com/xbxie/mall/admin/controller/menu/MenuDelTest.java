@@ -1,9 +1,9 @@
 package com.xbxie.mall.admin.controller.menu;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.xbxie.mall.admin.entityback.MenuEntity;
-import com.xbxie.mall.admin.service.MenuService;
 import com.xbxie.mall.admin.utils.TestUtils;
+import com.xbxie.mall.common.entity.CommonMenuEntity;
+import com.xbxie.mall.common.service.CommonMenuService;
 import com.xbxie.mall.common.utils.R;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -29,7 +29,7 @@ public class MenuDelTest {
     private TestUtils testUtils;
 
     @Resource
-    private MenuService menuService;
+    private CommonMenuService commonMenuService;
 
     private List<Long> menuIds = new ArrayList<>();
 
@@ -38,7 +38,7 @@ public class MenuDelTest {
         Random random = new Random();
         // 新增三条测试数据
         for (int i = 0; i < 3; i++) {
-            MenuEntity menuEntity = new MenuEntity();
+            CommonMenuEntity menuEntity = new CommonMenuEntity();
             menuEntity.setId(null);
             menuEntity.setPid(null);
             menuEntity.setName(random.nextLong() + "");
@@ -47,7 +47,7 @@ public class MenuDelTest {
             menuEntity.setCreateTime(null);
             menuEntity.setUpdateTime(null);
             
-            menuService.save(menuEntity);
+            commonMenuService.save(menuEntity);
             menuIds.add(menuEntity.getId());
         }
     }
@@ -72,8 +72,8 @@ public class MenuDelTest {
 
         // 验证数据库中的数据
         // 验证菜单表
-        QueryWrapper<MenuEntity> wrapper = new QueryWrapper<MenuEntity>().eq("id", menuId);
-        Assertions.assertEquals(0, menuService.count(wrapper));
+        QueryWrapper<CommonMenuEntity> wrapper = new QueryWrapper<CommonMenuEntity>().eq("id", menuId);
+        Assertions.assertEquals(0, commonMenuService.count(wrapper));
 
     }
 

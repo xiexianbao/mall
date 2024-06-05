@@ -1,9 +1,9 @@
 package com.xbxie.mall.admin.controller.menu;
 
-import com.xbxie.mall.admin.entityback.MenuEntity;
-import com.xbxie.mall.admin.service.MenuService;
 import com.xbxie.mall.admin.utils.TestUtils;
 import com.xbxie.mall.admin.vo.*;
+import com.xbxie.mall.common.entity.CommonMenuEntity;
+import com.xbxie.mall.common.service.CommonMenuService;
 import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.BeanUtils;
@@ -28,11 +28,11 @@ public class MenuUpdateTest {
     private TestUtils testUtils;
 
     @Resource
-    private MenuService menuService;
+    private CommonMenuService commonMenuService;
 
     private List<Long> menuIds = new ArrayList<>();
 
-    private List<MenuEntity> menuEntities = new ArrayList<>();
+    private List<CommonMenuEntity> menuEntities = new ArrayList<>();
 
     public MenuUpdateVo getNewMenuUpdateVo() {
         Random random = new Random();
@@ -51,7 +51,7 @@ public class MenuUpdateTest {
         // 初始化测试数据
         // 添加用户
         for (int i = 1; i <= 30; i++) {
-            MenuEntity menuEntity = new MenuEntity();
+            CommonMenuEntity menuEntity = new CommonMenuEntity();
 
             menuEntity.setId(null);
             menuEntity.setPid(null);
@@ -61,8 +61,8 @@ public class MenuUpdateTest {
             menuEntity.setCreateTime(null);
             menuEntity.setUpdateTime(null);
 
-            menuService.save(menuEntity);
-            MenuEntity menuEntity1 = menuService.getById(menuEntity.getId());
+            commonMenuService.save(menuEntity);
+            CommonMenuEntity menuEntity1 = commonMenuService.getById(menuEntity.getId());
             menuEntities.add(menuEntity1);
             menuIds.add(menuEntity1.getId());
         }
@@ -77,8 +77,8 @@ public class MenuUpdateTest {
     @DisplayName("更新菜单")
     @Test
     void update() throws Exception {
-        MenuEntity menuEntity1Before = this.menuEntities.get(0);
-        MenuEntity menuEntity2Before = this.menuEntities.get(1);
+        CommonMenuEntity menuEntity1Before = this.menuEntities.get(0);
+        CommonMenuEntity menuEntity2Before = this.menuEntities.get(1);
 
         MenuUpdateVo menuUpdateVo = new MenuUpdateVo();
         MenuUpdateVo newMenuUpdateVo = getNewMenuUpdateVo();
@@ -90,7 +90,7 @@ public class MenuUpdateTest {
         Thread.sleep(1000);
         testUtils.assertSuccess(url, menuUpdateVo,"更新菜单成功");
 
-        MenuEntity menuEntity1After = menuService.getById(menuUpdateVo.getId());
+        CommonMenuEntity menuEntity1After = commonMenuService.getById(menuUpdateVo.getId());
         // id
         Assertions.assertEquals(menuUpdateVo.getId(), menuEntity1After.getId());
         // pid
@@ -110,8 +110,8 @@ public class MenuUpdateTest {
     @DisplayName("菜单路径重复")
     @Test
     void pathRepeat() {
-        MenuEntity menuEntity1 = this.menuEntities.get(0);
-        MenuEntity menuEntity2 = this.menuEntities.get(1);
+        CommonMenuEntity menuEntity1 = this.menuEntities.get(0);
+        CommonMenuEntity menuEntity2 = this.menuEntities.get(1);
         MenuUpdateVo menuUpdateVo = new MenuUpdateVo();
         BeanUtils.copyProperties(menuEntity1, menuUpdateVo);
         menuUpdateVo.setPath(menuEntity2.getPath());
@@ -122,8 +122,8 @@ public class MenuUpdateTest {
     @DisplayName("菜单名重复")
     @Test
     void nameRepeat() {
-        MenuEntity menuEntity1 = this.menuEntities.get(0);
-        MenuEntity menuEntity2 = this.menuEntities.get(1);
+        CommonMenuEntity menuEntity1 = this.menuEntities.get(0);
+        CommonMenuEntity menuEntity2 = this.menuEntities.get(1);
         MenuUpdateVo menuUpdateVo = new MenuUpdateVo();
         BeanUtils.copyProperties(menuEntity1, menuUpdateVo);
         menuUpdateVo.setName(menuEntity2.getName());
