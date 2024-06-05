@@ -3,30 +3,32 @@ package com.xbxie.mall.thirdpart.utils;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.PutObjectRequest;
+import com.xbxie.mall.thirdpart.config.OssConfig;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
  * created by xbxie on 2024/5/17
  */
+@Component
 public class OssUtils {
-    private static final String endpoint = "https://oss-cn-beijing.aliyuncs.com";
-    private static final String accessKeyId = "LTAI5t7iLLPCoF36meA9rKoG";
-    private static final String accessKeySecret = "Yqkcuqy9zuBXeZChjAF0dR2yc0VpqO";
-    private static final String bucketName = "gulimall-source";
-    private static final String bucketDomain  = "https://gulimall-source.oss-cn-beijing.aliyuncs.com";
+    @Resource
+    private OssConfig ossConfig;
 
-    public static String uploadImg(MultipartFile multipartFile) {
-        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+    public String uploadImg(MultipartFile multipartFile) {
+        OSS ossClient = new OSSClientBuilder().build(ossConfig.getEndpoint(), ossConfig.getAccessKeyId(), ossConfig.getAccessKeySecret());
 
         try {
             String originalFilename = multipartFile.getOriginalFilename();
             InputStream inputStream = multipartFile.getInputStream();
             String objectName = "mall/" + System.currentTimeMillis() + originalFilename.substring(originalFilename.lastIndexOf("."));
-            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, objectName, inputStream);
+            PutObjectRequest putObjectRequest = new PutObjectRequest(ossConfig.getBucketName(), objectName, inputStream);
             ossClient.putObject(putObjectRequest);
-            return bucketDomain + "/" + objectName;
+            return ossConfig.getBucketDomain() + "/" + objectName;
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

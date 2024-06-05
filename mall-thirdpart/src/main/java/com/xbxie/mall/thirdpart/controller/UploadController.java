@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,9 +20,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/upload")
 public class UploadController {
+    @Resource
+    private OssUtils ossUtils;
+
     @PostMapping("/img")
     public R<Map<String, String>> login(@RequestParam("file") MultipartFile multipartFile) {//得到文件的名字
-        String fileUrl = OssUtils.uploadImg(multipartFile);
+        String fileUrl = ossUtils.uploadImg(multipartFile);
         Map<String, String> map = new HashMap<>();
         map.put("url", fileUrl);
         return R.success(map);
